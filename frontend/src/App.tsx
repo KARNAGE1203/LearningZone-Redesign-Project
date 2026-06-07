@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import Login from '@/pages/Login';
-import MyCourses from '@/pages/MyCourses';
-import Home from '@/pages/Home';
-import CourseMaterials from '@/pages/CourseMaterials';
+import Login from './pages/Login';
+import MyCourses from './pages/MyCourses';
+import Home from './pages/Home';
+import CourseMaterials from './pages/CourseMaterials';
 
 type Page = 'courses' | 'dashboard' | 'materials';
 
@@ -25,7 +25,7 @@ function App() {
   }
 
   if (!userId) {
-    return <Login onSuccess={(id) => { setUserId(id); setPage('courses'); }} />;
+    return <Login onSuccess={(id: string) => { setUserId(id); setPage('courses'); }} />;
   }
 
   if (page === 'courses') {

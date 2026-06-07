@@ -4,7 +4,7 @@ import {
   LogOut, HelpCircle, Search, FileText, FlaskConical,
   PlayCircle, LayoutGrid,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 interface CourseMaterialsProps {
   onBack: () => void;

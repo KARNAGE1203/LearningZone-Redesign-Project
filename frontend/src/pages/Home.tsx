@@ -5,7 +5,7 @@ import {
   Clock, FileText, MessageSquare, TrendingUp, AlertTriangle, Star,
   ChevronRight, Megaphone, Target, Users, Menu, X, Brain, ClipboardList,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 interface HomeProps {
   userId: string;

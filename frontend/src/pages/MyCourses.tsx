@@ -4,7 +4,7 @@ import {
   Globe, Mountain, Building2, CalendarDays, Library, Headphones,
   Users, Megaphone, Calendar, ExternalLink, ChevronRight,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 interface MyCoursesProps {
   onEnterCourse: () => void;
@@ -436,7 +436,7 @@ export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
 
               {/* Nodes + labels */}
               <div className="grid grid-cols-4">
-                {TIMELINE.map(({ block, course, grade, status }, i) => {
+                {TIMELINE.map(({ block, course, grade, status }) => {
                   const done = status === 'done';
                   const active = status === 'active';
 

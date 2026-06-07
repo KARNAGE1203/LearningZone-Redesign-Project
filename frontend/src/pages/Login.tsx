@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Eye, EyeOff, Loader2, AlertCircle, GraduationCap, User, Lock, ShieldCheck, ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { api } from '@/lib/api';
+import { cn } from '../lib/utils';
+import { api } from '../lib/api';
 
 interface LoginProps {
   onSuccess: (userId: string) => void;
