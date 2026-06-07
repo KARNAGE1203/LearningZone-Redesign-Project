@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  studentId  String   @unique
+  email      String   @unique
+  name       String
+  avatar     String?
+  programme  String
+  year       Int
+  password   String
+  createdAt  DateTime @default(now())
+
+  enrollments   Enrollment[]
+  announcements Announcement[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  title       String
+  description String
+  credits     Int
+  semester    String
+  department  String
+  instructor  String
+  room        String?
+  schedule    String?
+  createdAt   DateTime @default(now())
+
+  enrollments   Enrollment[]
+  materials     Material[]
+  assignments   Assignment[]
+  announcements Announcement[]
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  grade     String?
+  progress  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model Material {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  type      String
+  url       String
+  week      Int?
+  createdAt DateTime @default(now())
+
+  course Course @relation(fields: [courseId], references: [id])
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  courseId    String
+  title       String
+  description String
+  dueDate     DateTime
+  maxMarks    Int
+  type        String
+  createdAt   DateTime @default(now())
+
+  course Course @relation(fields: [courseId], references: [id])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  title     String
+  body      String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+}
