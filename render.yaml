@@ -1,0 +1,38 @@
+# Render Blueprint — deploys the Learning Zone API as a web service.
+# https://render.com/docs/blueprint-spec
+#
+# Usage:
+#   1. Push this repo to GitHub.
+#   2. Go to Render → New → Blueprint and connect the repo.
+#   3. Set the two required environment variables below (FRONTEND_URL, JWT_SECRET).
+#   4. Click Deploy.
+
+services:
+  - type: web
+    name: learning-zone-api
+    runtime: node
+    # Tell Render to only look inside the backend/ subfolder.
+    rootDir: backend
+    # Install all deps (including devDeps so ts-node is available during build),
+    # generate the Prisma client, then compile TypeScript.
+    buildCommand: npm install && npx prisma generate && npm run build
+    # Run DB migrations, seed demo data (idempotent upserts), then start the server.
+    startCommand: npx prisma migrate deploy && node prisma/seed.js && node dist/index.js
+    # Render's free tier goes to sleep after 15 min of inactivity.
+    # Upgrade to a paid instance type to avoid cold starts.
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: PORT
+        value: 10000           # Render assigns this automatically; keep in sync.
+      - key: JWT_SECRET
+        # Render will auto-generate a secure value — rotate after first deploy.
+        generateValue: true
+      - key: FRONTEND_URL
+        # Set this to your Netlify URL after deploying the frontend, e.g.:
+        #   https://learning-zone.netlify.app
+        # Comma-separate multiple origins if needed.
+        sync: false            # Must be set manually in the Render dashboard.

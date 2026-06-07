@@ -11,7 +11,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
+// Accept a comma-separated list of allowed origins so both localhost and
+// the production Netlify URL can be set in one FRONTEND_URL env var.
+const allowedOrigins = (process.env.FRONTEND_URL ?? 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      // Allow server-to-server requests (no origin) and listed origins.
+      if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+      else cb(new Error(`CORS: ${origin} not permitted`));
+    },
+  })
+);
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {

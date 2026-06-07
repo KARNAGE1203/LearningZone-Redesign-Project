@@ -1,44 +1,198 @@
-# Learning Zone Redesign Project
+<div align="center">
 
-A modern redesign of the Learning Zone platform with a full-stack architecture.
+# LearningZone
 
-## Overview
+**A full-stack university portal redesign**
 
-- **Backend:** Node.js + TypeScript, Prisma ORM, authentication, course and user management.
-- **Frontend:** Vite + React + TypeScript, Tailwind CSS, page-based learning experience.
+Built to demonstrate what a modern, student-centric LMS could look like —  
+designed and developed as a portfolio project for De Montfort University Dubai.
 
-## Repository Structure
+[![Frontend — Netlify](https://img.shields.io/badge/Frontend-Netlify-00C7B7?logo=netlify&logoColor=white)](#)
+[![Backend — Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render&logoColor=white)](#)
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
-- `backend/` — server code, Prisma schema, routes, and middleware.
-- `frontend/` — React app with pages for login, dashboard, courses, and course materials.
+</div>
 
-## Getting Started
+---
 
-1. Install dependencies
-   - `cd backend && npm install`
-   - `cd frontend && npm install`
-2. Configure environment variables for the backend (database URL, auth secrets).
-3. Run the backend and frontend in development mode.
+## Why this project exists
 
-### Local development
+DMU Dubai's existing learning portal works, but it wasn't designed with the student experience in mind. This is a ground-up redesign that prioritises clarity, hierarchy, and accessibility — built to show professors and peers what a better portal could look like, using the same data and workflows but with a completely rethought interface.
 
-- Start the backend: `cd backend && npm run dev`
-- Start the frontend: `cd frontend && npm run dev`
-- Login with demo credentials: `P2936821` / `IamStudent123`
+---
 
-### Production deployment
+## Pages
 
-The frontend is static and needs a separately hosted backend.
+| Page | Description |
+|------|-------------|
+| **Login** | Student ID (`P` + 7 digits) + password auth. JWT stored in `localStorage`. |
+| **My Courses** | Post-login home — academic year block timeline, active course hero card, university announcements, communities, academic calendar. |
+| **Dashboard** | Course-level home — animated stats (GPA, credits, attendance), progress ring, deadlines, today's classes, announcements. |
+| **Course Materials** | Week-by-week content accordion — filterable by type (Slides / Labs / Videos), smooth animated open/close. |
 
-1. Deploy the backend to a server or cloud host (Render, Railway, Fly, Heroku, etc.).
-2. Add the backend URL to the frontend using `VITE_API_BASE_URL`.
-3. In Netlify, set `VITE_API_BASE_URL` to `https://your-backend.example.com/api`.
-4. Ensure the backend CORS allows your Netlify site origin.
+---
 
-## Notes
+## Tech stack
 
-This repository is named **Learning Zone Redesign Project**.
+### Frontend
+| Tool | Purpose |
+|------|---------|
+| React 18 + TypeScript | UI framework |
+| Vite 5 | Build tool (pinned — Vite 6 requires Node ≥ 20.19) |
+| Tailwind CSS v3 | Utility-first styling |
+| lucide-react | Icon library |
+
+### Backend
+| Tool | Purpose |
+|------|---------|
+| Node.js 20 + Express 5 + TypeScript | API server |
+| Prisma 5 | ORM (pinned — Prisma 7 requires Node ≥ 20.19) |
+| SQLite | Database — auto-seeded on every deploy |
+| JWT + bcryptjs | Authentication |
+
+---
+
+## Getting started locally
+
+### Prerequisites
+
+- **Node.js ≥ 20.14.0** — check with `node -v`
+
+### 1 — Clone
+
+```bash
+git clone https://github.com/YOUR_USERNAME/learning-zone-redesign.git
+cd learning-zone-redesign
+```
+
+### 2 — Backend
+
+```bash
+cd backend
+cp .env.example .env        # fill in JWT_SECRET with any long random string
+npm install
+npx prisma migrate deploy   # create the SQLite schema
+npm run db:seed             # seed the demo student account
+npm run dev                 # API running at http://localhost:3001
+```
+
+### 3 — Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev                 # app running at http://localhost:5173
+```
+
+> The frontend uses `VITE_API_BASE_URL` (defaults to `/api`). In dev, Vite proxies `/api/*` to the backend automatically — no extra config needed.
+
+---
+
+## Environment variables
+
+### Backend — `backend/.env`
+
+| Variable | Description | Default / Example |
+|----------|-------------|-------------------|
+| `DATABASE_URL` | SQLite file path (relative to `backend/`) | `file:./dev.db` |
+| `PORT` | Server port | `3001` |
+| `FRONTEND_URL` | Comma-separated allowed CORS origins | `https://your-app.netlify.app,http://localhost:5173` |
+| `JWT_SECRET` | Long random string for signing tokens — **change this** | `openssl rand -hex 64` |
+
+### Frontend — `frontend/.env.local`
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `VITE_API_BASE_URL` | Full backend API URL (leave blank for local `/api` proxy) | `https://learning-zone-api.onrender.com/api` |
+
+---
+
+## Deployment
+
+### Backend → Render
+
+1. Push this repo to GitHub.
+2. Go to **render.com → New → Blueprint** and connect your repo.  
+   Render detects `render.yaml` at the root and pre-fills the service config.
+3. In the Render dashboard set these two env vars manually:
+   - `JWT_SECRET` → a long random string (`openssl rand -hex 64`)
+   - `FRONTEND_URL` → your Netlify URL (e.g. `https://learning-zone.netlify.app`)
+4. Click **Deploy**. Render installs deps, compiles TypeScript, runs migrations, and seeds the DB automatically.
+5. Copy your Render service URL (e.g. `https://learning-zone-api.onrender.com`).
+
+> **Free tier note:** Render spins down services after 15 min of inactivity. The first request after a sleep takes ~30 s. Upgrade to a paid plan for always-on.
+
+### Frontend → Netlify
+
+1. In the Netlify dashboard connect your GitHub repo.
+2. Configure the build:
+   - **Base directory:** `frontend`
+   - **Build command:** `npm run build`
+   - **Publish directory:** `frontend/dist`
+3. Add an environment variable under **Site settings → Environment variables**:
+   - `VITE_API_BASE_URL` = `https://your-render-service.onrender.com/api`
+4. **Trigger a redeploy** — Netlify must rebuild so the env var is baked into the JS bundle.
+
+---
+
+## Demo credentials
+
+| Field | Value |
+|-------|-------|
+| Student ID | `P2936821` |
+| Password | `IamStudent123` |
+
+---
+
+## Project structure
+
+```
+learning-zone-redesign/
+├── backend/
+│   ├── prisma/
+│   │   ├── schema.prisma          # Data model
+│   │   ├── migrations/            # Migration history
+│   │   ├── seed.ts                # Dev seed (ts-node)
+│   │   └── seed.js                # Prod seed (plain Node — no ts-node needed)
+│   ├── src/
+│   │   ├── index.ts               # Express entry point
+│   │   └── routes/
+│   │       ├── auth.ts            # POST /api/auth/login
+│   │       ├── users.ts
+│   │       ├── courses.ts
+│   │       └── dashboard.ts
+│   ├── .env.example
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Login.tsx
+│   │   │   ├── MyCourses.tsx      # Post-login home
+│   │   │   ├── Home.tsx           # Course dashboard
+│   │   │   └── CourseMaterials.tsx
+│   │   ├── lib/
+│   │   │   ├── api.ts             # Typed fetch wrapper
+│   │   │   └── utils.ts
+│   │   └── App.tsx                # State-based router
+│   └── package.json
+├── render.yaml                    # One-click Render deployment blueprint
+└── README.md
+```
+
+---
+
+## Roadmap
+
+- [ ] Connect My Courses and Dashboard to live API data
+- [ ] Assignments submission flow
+- [ ] Quizzes module
+- [ ] Grade book with trend charts
+- [ ] Mobile drawer for Course Materials
+- [ ] Dark mode
+- [ ] Push notifications for upcoming deadlines
+
+---
 
 ## License
 
-This project is available under the terms of the repository license.
+MIT
