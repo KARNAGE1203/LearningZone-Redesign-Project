@@ -1,25 +1,28 @@
 import { useState, useEffect } from 'react';
 import {
   GraduationCap, LayoutDashboard, BookOpen, BarChart2, Calendar,
-  Settings, HelpCircle, LogOut, Bell, Search, Plus, ArrowRight,
+  Settings, HelpCircle, LogOut, Bell, Search, ArrowRight, ArrowLeft,
   Clock, FileText, MessageSquare, TrendingUp, AlertTriangle, Star,
-  ChevronRight, Megaphone, Target, Users, Menu, X,
+  ChevronRight, Megaphone, Target, Users, Menu, X, Brain, ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HomeProps {
   userId: string;
   onLogout: () => void;
+  onBackToHome: () => void;
+  onEnterCourse: () => void;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Dashboard',  active: true  },
-  { icon: BookOpen,         label: 'My Courses', active: false },
-  { icon: BarChart2,        label: 'Grades',     active: false },
-  { icon: Calendar,         label: 'Schedule',   active: false },
-  { icon: Settings,         label: 'Settings',   active: false },
+  { icon: LayoutDashboard, label: 'Dashboard',   active: true  },
+  { icon: BarChart2,        label: 'Grades',      active: false },
+  { icon: Calendar,         label: 'Schedule',    active: false },
+  { icon: Brain,            label: 'Quizzes',     active: false },
+  { icon: ClipboardList,    label: 'Assignments', active: false },
+  { icon: Settings,         label: 'Settings',    active: false },
 ];
 
 const STATS = [
@@ -59,7 +62,7 @@ const GRADE_PCT = 0.90;
 
 // ─── Sidebar content (shared between desktop + mobile drawer) ──────
 
-function SidebarContent({ onClose, onLogout }: { onClose?: () => void; onLogout?: () => void }) {
+function SidebarContent({ onClose, onLogout, onBackToHome }: { onClose?: () => void; onLogout?: () => void; onBackToHome?: () => void }) {
   return (
     <div className="flex flex-col h-full">
 
@@ -86,14 +89,17 @@ function SidebarContent({ onClose, onLogout }: { onClose?: () => void; onLogout?
         )}
       </div>
 
-      {/* New Request CTA */}
+      {/* Back to Home */}
       <div className="px-5 py-5">
         <button
-          className="w-full flex items-center justify-center gap-2 h-10 rounded-xl text-white text-sm font-semibold cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.97] shadow-md"
-          style={{ background: '#0d8a7a', boxShadow: '0 4px 12px rgba(13,138,122,0.28)' }}
+          onClick={onBackToHome}
+          className="w-full flex items-center gap-2.5 h-10 px-4 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150"
+          style={{ color: '#0d8a7a', border: '1.5px solid rgba(13,138,122,0.25)', background: 'rgba(13,138,122,0.06)' }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.12)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.06)')}
         >
-          <Plus className="w-4 h-4" strokeWidth={2.5} />
-          New Request
+          <ArrowLeft className="w-4 h-4" strokeWidth={2} />
+          Back to Home
         </button>
       </div>
 
@@ -146,7 +152,7 @@ function SidebarContent({ onClose, onLogout }: { onClose?: () => void; onLogout?
 
 // ─── Main component ───────────────────────────────────────────────
 
-export default function Home({ userId: _userId, onLogout }: HomeProps) {
+export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterCourse }: HomeProps) {
   const [search,     setSearch]     = useState('');
   const [ready,      setReady]      = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -172,7 +178,7 @@ export default function Home({ userId: _userId, onLogout }: HomeProps) {
           DESKTOP SIDEBAR — hidden below lg
       ══════════════════════════════════════════ */}
       <aside className="hidden lg:flex lg:w-[240px] shrink-0 flex-col h-full bg-white border-r border-slate-200">
-        <SidebarContent onLogout={onLogout} />
+        <SidebarContent onLogout={onLogout} onBackToHome={onBackToHome} />
       </aside>
 
       {/* ══════════════════════════════════════════
@@ -195,7 +201,7 @@ export default function Home({ userId: _userId, onLogout }: HomeProps) {
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <SidebarContent onClose={() => setDrawerOpen(false)} onLogout={onLogout} />
+        <SidebarContent onClose={() => setDrawerOpen(false)} onLogout={onLogout} onBackToHome={onBackToHome} />
       </div>
 
       {/* ══════════════════════════════════════════
@@ -425,10 +431,11 @@ export default function Home({ userId: _userId, onLogout }: HomeProps) {
                   {/* Actions */}
                   <div className="flex flex-wrap items-center gap-3">
                     <button
+                      onClick={onEnterCourse}
                       className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97]"
                       style={{ background: '#0d8a7a', boxShadow: '0 4px 12px rgba(13,138,122,0.28)' }}
                     >
-                      Go to Course
+                      Continue Learning
                       <ArrowRight className="w-4 h-4" />
                     </button>
                     <button className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-all duration-150 active:scale-[0.97]">
