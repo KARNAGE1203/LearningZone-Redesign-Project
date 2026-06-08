@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import {
   GraduationCap, ArrowLeft, ChevronDown,
-  LogOut, HelpCircle, Search, FileText, FlaskConical,
-  PlayCircle, LayoutGrid,
+  LogOut, HelpCircle, Search, FileText, FlaskConical, PlayCircle,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import type { CoursePageNav } from '../App';
 
 interface CourseMaterialsProps {
-  onBack: () => void;
-  onLogout: () => void;
+  onBack:     () => void;
+  onLogout:   () => void;
+  onNavigate: (page: CoursePageNav) => void;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -89,13 +90,16 @@ const FILTER_TYPE: Record<FilterKey, ItemType | null> = {
 const TABS:    TabKey[]    = ['Materials', 'Assessments', 'Course Info', 'Resources'];
 const FILTERS: FilterKey[] = ['All', 'Slides', 'Labs', 'Videos'];
 
-const COURSE_NAV = [
-  'Materials', 'Assessments', 'Grades', 'Resources',
-] as const;
+const COURSE_NAV: { label: string; page: CoursePageNav }[] = [
+  { label: 'Materials',   page: 'materials'   },
+  { label: 'Assessments', page: 'assessments' },
+  { label: 'Grades',      page: 'grades'      },
+  { label: 'Resources',   page: 'resources'   },
+];
 
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 
-function CourseSidebar({ onBack, onLogout }: { onBack: () => void; onLogout: () => void }) {
+function CourseSidebar({ onBack, onLogout, onNavigate }: { onBack: () => void; onLogout: () => void; onNavigate: (page: CoursePageNav) => void }) {
   return (
     <div className="flex flex-col h-full">
 
@@ -131,11 +135,12 @@ function CourseSidebar({ onBack, onLogout }: { onBack: () => void; onLogout: () 
 
       {/* Course nav */}
       <nav className="flex-1 px-4 space-y-0.5 overflow-y-auto">
-        {COURSE_NAV.map((label) => {
-          const active = label === 'Materials';
+        {COURSE_NAV.map(({ label, page }) => {
+          const active = page === 'materials';
           return (
             <button
               key={label}
+              onClick={() => onNavigate(page)}
               className={cn(
                 'w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm cursor-pointer transition-all duration-150 text-left relative',
                 active
@@ -171,7 +176,7 @@ function CourseSidebar({ onBack, onLogout }: { onBack: () => void; onLogout: () 
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function CourseMaterials({ onBack, onLogout }: CourseMaterialsProps) {
+export default function CourseMaterials({ onBack, onLogout, onNavigate }: CourseMaterialsProps) {
   const [activeTab,       setActiveTab]       = useState<TabKey>('Materials');
   const [activeFilter,    setActiveFilter]    = useState<FilterKey>('All');
   const [expandedWeeks,   setExpandedWeeks]   = useState<Set<number>>(new Set([34]));
@@ -201,7 +206,7 @@ export default function CourseMaterials({ onBack, onLogout }: CourseMaterialsPro
 
       {/* ── Sidebar ── */}
       <aside className="hidden lg:flex lg:w-[240px] shrink-0 flex-col h-full bg-white border-r border-slate-200">
-        <CourseSidebar onBack={onBack} onLogout={onLogout} />
+        <CourseSidebar onBack={onBack} onLogout={onLogout} onNavigate={onNavigate} />
       </aside>
 
       {/* ── Main area ── */}
@@ -230,20 +235,31 @@ export default function CourseMaterials({ onBack, onLogout }: CourseMaterialsPro
 
             {/* Tab bar */}
             <div className="flex items-end gap-0 border-b border-slate-200 -mx-6 lg:-mx-8 px-6 lg:px-8">
-              {TABS.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={cn(
-                    'px-4 py-3 text-sm font-semibold cursor-pointer transition-all duration-150 border-b-2 -mb-px whitespace-nowrap',
-                    activeTab === tab
-                      ? 'border-teal-600 text-teal-700'
-                      : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
-                  )}
-                >
-                  {tab}
-                </button>
-              ))}
+              {TABS.map((tab) => {
+                const tabPageMap: Partial<Record<TabKey, CoursePageNav>> = {
+                  'Assessments': 'assessments',
+                  'Course Info': 'course-info',
+                  'Resources':   'resources',
+                };
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => {
+                      const dest = tabPageMap[tab];
+                      if (dest) onNavigate(dest);
+                      else setActiveTab(tab);
+                    }}
+                    className={cn(
+                      'px-4 py-3 text-sm font-semibold cursor-pointer transition-all duration-150 border-b-2 -mb-px whitespace-nowrap',
+                      activeTab === tab
+                        ? 'border-teal-600 text-teal-700'
+                        : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
+                    )}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

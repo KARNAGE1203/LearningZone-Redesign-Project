@@ -66,7 +66,7 @@ function App() {
   }
 
   if (page === 'materials') {
-    return <CourseMaterials onBack={() => setPage('dashboard')} onLogout={handleLogout} />;
+    return <CourseMaterials onBack={() => setPage('dashboard')} onLogout={handleLogout} onNavigate={handleNavigate} />;
   }
 
   if (page === 'grades')      return <Grades      {...sharedProps} />;
