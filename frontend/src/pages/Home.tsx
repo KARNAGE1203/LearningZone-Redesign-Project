@@ -1,68 +1,117 @@
 import { useState, useEffect } from 'react';
 import {
-  GraduationCap, LayoutDashboard, BookOpen, BarChart2, Calendar,
-  Settings, HelpCircle, LogOut, Bell, Search, ArrowRight, ArrowLeft,
-  Clock, FileText, MessageSquare, TrendingUp, AlertTriangle, Star,
-  ChevronRight, Megaphone, Target, Users, Menu, X, Brain, ClipboardList,
+  GraduationCap, LayoutDashboard, BookOpen, BarChart2,
+  HelpCircle, Bell, Search, ArrowRight, ArrowLeft,
+  Clock, FileText, MessageSquare, TrendingUp, AlertTriangle,
+  ChevronRight, Megaphone, Menu, X, ClipboardList,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import type { CoursePageNav } from '../App';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface HomeProps {
-  userId: string;
-  onLogout: () => void;
-  onBackToHome: () => void;
+  userId:        string;
+  onLogout:      () => void;
+  onBackToHome:  () => void;
   onEnterCourse: () => void;
+  onNavigate:    (page: CoursePageNav) => void;
 }
 
-// ─── Data ─────────────────────────────────────────────────────────
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Dashboard',   active: true  },
-  { icon: BarChart2,        label: 'Grades',      active: false },
-  { icon: Calendar,         label: 'Schedule',    active: false },
-  { icon: Brain,            label: 'Quizzes',     active: false },
-  { icon: ClipboardList,    label: 'Assignments', active: false },
-  { icon: Settings,         label: 'Settings',    active: false },
+  { icon: LayoutDashboard, label: 'Dashboard',   page: 'dashboard'   as CoursePageNav },
+  { icon: BarChart2,       label: 'Grades',       page: 'grades'      as CoursePageNav },
+  { icon: FileText,        label: 'Materials',    page: 'materials'   as CoursePageNav },
+  { icon: ClipboardList,   label: 'Assessments',  page: 'assessments' as CoursePageNav },
+  { icon: BookOpen,        label: 'Resources',    page: 'resources'   as CoursePageNav },
 ];
 
 const STATS = [
-  { label: 'GPA',        value: '3.75', sub: 'out of 4.0',          icon: Star,     ring: '#10b981', bg: '#f0fdf4', fg: '#059669' },
-  { label: 'Credits',    value: '18',   sub: '20 enrolled this sem', icon: BookOpen, ring: '#3b82f6', bg: '#eff6ff', fg: '#2563eb' },
-  { label: 'Attendance', value: '92%',  sub: 'this semester',        icon: Target,   ring: '#f59e0b', bg: '#fffbeb', fg: '#d97706' },
-  { label: 'Next Due',   value: '2d',   sub: 'Phase Test 2 · Jun 2', icon: AlertTriangle, ring: '#ef4444', bg: '#fef2f2', fg: '#dc2626' },
+  {
+    label: 'Materials Available',
+    value: '24',
+    sub:   'This week',
+    icon:  FileText,
+    ring:  '#0d8a7a',
+    bg:    '#f0fdf4',
+    fg:    '#059669',
+  },
+  {
+    label: 'Pending Items',
+    value: '3',
+    sub:   'Require attention',
+    icon:  Clock,
+    ring:  '#f59e0b',
+    bg:    '#fffbeb',
+    fg:    '#d97706',
+  },
+  {
+    label: 'Phase Test 2',
+    value: '2 days',
+    sub:   'Jun 2 · 14:00',
+    icon:  AlertTriangle,
+    ring:  '#ef4444',
+    bg:    '#fef2f2',
+    fg:    '#dc2626',
+  },
 ];
 
 const DEADLINES = [
-  { month: 'JUN', day: '02', title: 'Phase Test 2', course: 'CTECH 1704D', daysLeft: 2,  urgent: true  },
-  { month: 'JUN', day: '05', title: 'Final Exam',   course: 'CTECH 1704D', daysLeft: 5,  urgent: false },
-  { month: 'JUN', day: '10', title: 'Lab Report',   course: 'MATH 2201',   daysLeft: 10, urgent: false },
-];
-
-const TODAY_CLASSES = [
-  { time: '10:00', end: '11:30 AM', title: 'Operating Systems',    room: 'GH 2.01', live: true  },
-  { time: '02:00', end: '03:30 PM', title: 'Discrete Mathematics', room: 'VP 3.10', live: false },
+  { month: 'JUN', day: '02', title: 'Phase Test 2', course: 'CTEC 1704D', daysLeft: 2,  urgent: true  },
+  { month: 'JUN', day: '05', title: 'Final Exam',   course: 'CTEC 1704D', daysLeft: 5,  urgent: false },
+  { month: 'JUN', day: '10', title: 'Lab Report',   course: 'CTEC 1704D', daysLeft: 10, urgent: false },
 ];
 
 const ANNOUNCEMENTS = [
-  { initials: 'MH', color: '#0d8a7a', title: 'Exam Schedule Released',  body: 'Midterm schedules are now available in the portal. Please review your slots.', time: '2 hours ago' },
-  { initials: 'MA', color: '#7c3aed', title: 'New Reading Material',     body: 'Prof. Al-Ibaisi uploaded revision material for Phase Test 2.',                  time: 'Yesterday'   },
-  { initials: 'IT', color: '#64748b', title: 'Campus Wi-Fi Maintenance', body: 'Network maintenance this Saturday 2–6 AM. Plan your submissions accordingly.',   time: '2 days ago'  },
+  {
+    initials:    'MH',
+    avatarColor: '#0d8a7a',
+    borderColor: '#0d8a7a',
+    title:       'Exam Schedule Released',
+    body:        'Midterm schedules are now available in the portal.',
+    time:        '1 hour ago',
+  },
+  {
+    initials:    'MA',
+    avatarColor: '#0d8a7a',
+    borderColor: '#7c3aed',
+    title:       'New Reading Material',
+    body:        'Prof. Al-Ibaisi uploaded revision material for Phase Test 2.',
+    time:        'Yesterday',
+  },
+  {
+    initials:    'IT',
+    avatarColor: '#64748b',
+    borderColor: '#94a3b8',
+    title:       'Campus Wi-Fi Maintenance',
+    body:        'Network maintenance this Saturday 2–6 AM. Plan your submissions accordingly.',
+    time:        '3 days ago',
+  },
 ];
 
 const COURSE_MINI = [
-  { label: 'Materials',  value: '24', icon: FileText, color: '#d97706', bg: '#fffbeb' },
-  { label: 'Pending',    value: '3',  icon: Clock,    color: '#ef4444', bg: '#fef2f2' },
-  { label: 'Classmates', value: '89', icon: Users,    color: '#2563eb', bg: '#eff6ff' },
+  { label: 'Materials', value: '24', icon: FileText, color: '#d97706', bg: '#fffbeb' },
+  { label: 'Pending',   value: '3',  icon: Clock,    color: '#ef4444', bg: '#fef2f2' },
 ];
 
 // SVG ring math: r=30, circumference ≈ 188.5, A- = 90 %
-const RING_R  = 30;
-const RING_C  = 2 * Math.PI * RING_R;
+const RING_R    = 30;
+const RING_C    = 2 * Math.PI * RING_R;
 const GRADE_PCT = 0.90;
 
-// ─── Sidebar content (shared between desktop + mobile drawer) ──────
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
 
-function SidebarContent({ onClose, onLogout, onBackToHome }: { onClose?: () => void; onLogout?: () => void; onBackToHome?: () => void }) {
+function SidebarContent({
+  onClose,
+  onBackToHome,
+  onNavigate,
+}: {
+  onClose?:     () => void;
+  onBackToHome?: () => void;
+  onNavigate?:  (page: CoursePageNav) => void;
+}) {
   return (
     <div className="flex flex-col h-full">
 
@@ -77,7 +126,6 @@ function SidebarContent({ onClose, onLogout, onBackToHome }: { onClose?: () => v
             <p className="text-slate-400 text-[11px] mt-1">Student Portal</p>
           </div>
         </div>
-        {/* Close button — mobile only */}
         {onClose && (
           <button
             onClick={onClose}
@@ -110,60 +158,47 @@ function SidebarContent({ onClose, onLogout, onBackToHome }: { onClose?: () => v
 
       {/* Primary nav */}
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ icon: Icon, label, active }) => (
-          <button
-            key={label}
-            className={cn(
-              'w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm cursor-pointer transition-all duration-150 text-left relative',
-              active
-                ? 'bg-teal-50 text-teal-800 font-semibold'
-                : 'text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900'
-            )}
-            style={active ? { boxShadow: 'inset 3px 0 0 #0d8a7a' } : {}}
-          >
-            <Icon
-              className={cn('w-5 h-5 shrink-0', active ? 'text-teal-600' : 'text-slate-400')}
-              strokeWidth={active ? 2.2 : 1.8}
-            />
-            {label}
-            {active && <span className="ml-auto w-2 h-2 rounded-full bg-teal-500" />}
-          </button>
-        ))}
+        {NAV_ITEMS.map(({ icon: Icon, label, page }) => {
+          const active = page === 'dashboard';
+          return (
+            <button
+              key={label}
+              onClick={() => onNavigate?.(page)}
+              className={cn(
+                'w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm cursor-pointer transition-all duration-150 text-left relative',
+                active
+                  ? 'bg-teal-50 text-teal-800 font-semibold'
+                  : 'text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900'
+              )}
+              style={active ? { boxShadow: 'inset 3px 0 0 #0d8a7a' } : {}}
+            >
+              <Icon
+                className={cn('w-5 h-5 shrink-0', active ? 'text-teal-600' : 'text-slate-400')}
+                strokeWidth={active ? 2.2 : 1.8}
+              />
+              {label}
+              {active && <span className="ml-auto w-2 h-2 rounded-full bg-teal-500" />}
+            </button>
+          );
+        })}
       </nav>
-
-      {/* Bottom nav */}
-      <div className="px-4 pb-7 pt-5 space-y-1 border-t border-slate-200">
-        <button className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 cursor-pointer transition-all duration-150 text-left">
-          <HelpCircle className="w-5 h-5 shrink-0 text-slate-400" strokeWidth={1.8} />
-          Help
-        </button>
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 cursor-pointer transition-all duration-150 text-left group"
-        >
-          <LogOut className="w-5 h-5 shrink-0 text-slate-400 group-hover:text-red-500 transition-colors" strokeWidth={1.8} />
-          Logout
-        </button>
-      </div>
 
     </div>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────
+// ─── Main component ───────────────────────────────────────────────────────────
 
-export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterCourse }: HomeProps) {
+export default function Home({ userId: _userId, onLogout: _onLogout, onBackToHome, onEnterCourse, onNavigate }: HomeProps) {
   const [search,     setSearch]     = useState('');
   const [ready,      setReady]      = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Trigger enter animations slightly after paint
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 250);
     return () => clearTimeout(t);
   }, []);
 
-  // Close drawer on lg breakpoint
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
     const handler = (e: MediaQueryListEvent) => { if (e.matches) setDrawerOpen(false); };
@@ -174,17 +209,12 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      {/* ══════════════════════════════════════════
-          DESKTOP SIDEBAR — hidden below lg
-      ══════════════════════════════════════════ */}
+      {/* ── Desktop sidebar ── */}
       <aside className="hidden lg:flex lg:w-[240px] shrink-0 flex-col h-full bg-white border-r border-slate-200">
-        <SidebarContent onLogout={onLogout} onBackToHome={onBackToHome} />
+        <SidebarContent onBackToHome={onBackToHome} onNavigate={onNavigate} />
       </aside>
 
-      {/* ══════════════════════════════════════════
-          MOBILE DRAWER — slides in from left
-      ══════════════════════════════════════════ */}
-      {/* Backdrop */}
+      {/* ── Mobile drawer backdrop ── */}
       <div
         className={cn(
           'fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
@@ -193,7 +223,7 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
         onClick={() => setDrawerOpen(false)}
         aria-hidden="true"
       />
-      {/* Drawer panel */}
+      {/* ── Mobile drawer panel ── */}
       <div
         className={cn(
           'fixed top-0 left-0 z-50 h-full w-[280px] bg-white border-r border-slate-200 flex flex-col',
@@ -201,18 +231,14 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <SidebarContent onClose={() => setDrawerOpen(false)} onLogout={onLogout} onBackToHome={onBackToHome} />
+        <SidebarContent onClose={() => setDrawerOpen(false)} onBackToHome={onBackToHome} onNavigate={onNavigate} />
       </div>
 
-      {/* ══════════════════════════════════════════
-          MAIN AREA
-      ══════════════════════════════════════════ */}
+      {/* ── Main area ── */}
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
 
-        {/* ── Top Navbar ── */}
+        {/* Top Navbar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center gap-3 px-4 md:px-6 lg:px-8 shrink-0 z-20">
-
-          {/* Hamburger — mobile/tablet only */}
           <button
             className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors shrink-0"
             onClick={() => setDrawerOpen(true)}
@@ -221,16 +247,14 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Breadcrumb — hide on small screens */}
           <div className="hidden md:flex items-center gap-2 text-sm shrink-0 min-w-0">
             <span className="text-slate-400 hover:text-slate-600 cursor-pointer transition-colors whitespace-nowrap">My Courses</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
             <span className="text-slate-700 font-semibold truncate max-w-[200px] lg:max-w-[320px]">
-              CTECH1704D: Operating Systems and Networks
+              CTEC1704D: Operating Systems and Networks
             </span>
           </div>
 
-          {/* Search */}
           <div className="flex-1 relative max-w-xs sm:max-w-sm md:max-w-md mx-auto md:mx-4 lg:mx-auto">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             <input
@@ -242,7 +266,6 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
             />
           </div>
 
-          {/* Right icons */}
           <div className="flex items-center gap-1 shrink-0 ml-auto md:ml-0">
             <button
               className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
@@ -268,15 +291,14 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
           </div>
         </header>
 
-        {/* ── Scrollable body ── */}
+        {/* Scrollable body */}
         <main className="flex-1 overflow-y-auto">
 
-          {/* Hero Banner */}
+          {/* Hero banner */}
           <div
             className="relative overflow-hidden px-5 py-10 sm:px-8 sm:py-12 md:px-10 lg:py-14"
             style={{ background: 'linear-gradient(130deg, #1e1b4b 0%, #312e81 55%, #3730a3 100%)' }}
           >
-            {/* Decorative blobs */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute -top-16 right-10 w-72 h-72 md:w-96 md:h-96 rounded-full"
                 style={{ background: 'radial-gradient(circle, rgba(129,140,248,0.15), transparent 65%)' }} />
@@ -295,8 +317,8 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
             <div
               className="relative z-10 max-w-2xl"
               style={{
-                opacity: ready ? 1 : 0,
-                transform: ready ? 'translateY(0)' : 'translateY(-10px)',
+                opacity:    ready ? 1 : 0,
+                transform:  ready ? 'translateY(0)' : 'translateY(-10px)',
                 transition: 'opacity 0.7s ease, transform 0.7s ease',
               }}
             >
@@ -317,15 +339,15 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
 
           {/* Stats row — overlaps hero */}
           <div className="px-4 sm:px-6 lg:px-8 -mt-5 relative z-10 mb-5 md:mb-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               {STATS.map(({ label, value, sub, icon: Icon, ring, bg, fg }, i) => (
                 <div
                   key={label}
                   className="bg-white rounded-2xl p-4 sm:p-5 shadow-lg border border-slate-100 cursor-default hover:shadow-xl hover:-translate-y-1"
                   style={{
-                    borderTop: `3px solid ${ring}`,
-                    opacity: ready ? 1 : 0,
-                    transform: ready ? 'translateY(0) scale(1)' : 'translateY(28px) scale(0.97)',
+                    borderTop:  `3px solid ${ring}`,
+                    opacity:    ready ? 1 : 0,
+                    transform:  ready ? 'translateY(0) scale(1)' : 'translateY(28px) scale(0.97)',
                     transition: `opacity 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 110}ms, transform 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 110}ms, box-shadow 0.2s ease`,
                   }}
                 >
@@ -345,7 +367,7 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
           {/* Main content grid */}
           <div className="px-4 sm:px-6 lg:px-8 pb-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
 
-            {/* ── LEFT — full width on mobile, 2/3 on desktop ── */}
+            {/* ── LEFT: 2/3 ── */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-5 lg:space-y-6">
 
               {/* Active Course card */}
@@ -353,13 +375,12 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
                 <div className="h-1.5 w-full" style={{ background: 'linear-gradient(90deg, #0d8a7a, #34d399)' }} />
 
                 <div className="p-5 sm:p-6 lg:p-7">
-                  {/* Header */}
                   <div className="flex items-start justify-between gap-4 mb-5">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
                         <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-slate-400">Active Course</span>
                         <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 tracking-wider">
-                          CTECH 1704D
+                          CTEC 1704D
                         </span>
                       </div>
                       <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug mb-1.5">
@@ -370,7 +391,7 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
                       </p>
                     </div>
 
-                    {/* Animated SVG grade ring */}
+                    {/* SVG grade ring */}
                     <div className="relative shrink-0 w-[68px] h-[68px] sm:w-[76px] sm:h-[76px] flex items-center justify-center">
                       <svg
                         width="100%" height="100%"
@@ -390,8 +411,8 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
                     </div>
                   </div>
 
-                  {/* Mini metrics */}
-                  <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-5 sm:mb-6">
+                  {/* Mini metrics — 2 cards */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-5 sm:mb-6">
                     {COURSE_MINI.map(({ label, value, icon: Icon, color, bg }) => (
                       <div key={label} className="rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3.5" style={{ background: bg }}>
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/60 flex items-center justify-center shrink-0">
@@ -415,10 +436,10 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
                       <div
                         className="h-full rounded-full"
                         style={{
-                          width: ready ? '55%' : '0%',
+                          width:      ready ? '55%' : '0%',
                           background: 'linear-gradient(90deg, #0d8a7a, #34d399)',
                           transition: 'width 1.8s cubic-bezier(0.16, 1, 0.3, 1)',
-                          boxShadow: ready ? '0 0 10px rgba(52,211,153,0.4)' : 'none',
+                          boxShadow:  ready ? '0 0 10px rgba(52,211,153,0.4)' : 'none',
                         }}
                       />
                     </div>
@@ -490,8 +511,8 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
               </div>
             </div>
 
-            {/* ── RIGHT — full width on mobile, 1/3 on desktop ── */}
-            <div className="lg:col-span-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-5 lg:gap-6 lg:space-y-0">
+            {/* ── RIGHT: 1/3 ── */}
+            <div className="lg:col-span-1 space-y-4 sm:space-y-5 lg:space-y-6">
 
               {/* Upcoming Deadlines */}
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
@@ -536,51 +557,14 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
                 </button>
               </div>
 
-              {/* Today's Classes */}
+              {/* Recent Announcements */}
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-4 sm:mb-5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                      <Calendar className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
-                    </div>
-                    <h3 className="font-bold text-slate-800">Today's Classes</h3>
-                  </div>
-                  <span className="text-xs text-slate-400 font-medium">Mon, Jun 2</span>
-                </div>
-                <div className="space-y-2.5 sm:space-y-3">
-                  {TODAY_CLASSES.map((c, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        'flex items-center gap-3 p-3 sm:p-4 rounded-xl border cursor-pointer transition-all duration-150',
-                        c.live ? 'border-teal-200 bg-teal-50/60 hover:bg-teal-50' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'
-                      )}
-                    >
-                      <div className="w-1.5 h-10 sm:h-12 rounded-full shrink-0" style={{ background: c.live ? '#0d8a7a' : '#cbd5e1' }} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate">{c.title}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{c.time} – {c.end}</p>
-                        <p className="text-xs text-slate-400">{c.room}</p>
-                      </div>
-                      {c.live && (
-                        <span className="flex items-center gap-1.5 text-[10px] font-bold text-teal-700 bg-teal-100 px-2.5 py-1 rounded-full shrink-0">
-                          <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
-                          Live
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Announcements */}
-              <div className="sm:col-span-2 lg:col-span-1 bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-4 sm:mb-5">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                       <Megaphone className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
                     </div>
-                    <h3 className="font-bold text-slate-800">Announcements</h3>
+                    <h3 className="font-bold text-slate-800">Recent Announcements</h3>
                   </div>
                   <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-600">3 new</span>
                 </div>
@@ -588,10 +572,13 @@ export default function Home({ userId: _userId, onLogout, onBackToHome, onEnterC
                   {ANNOUNCEMENTS.map((a, i) => (
                     <div
                       key={i}
-                      className="flex gap-3.5 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors"
-                      style={{ borderLeft: '3px solid #0d8a7a', paddingLeft: '12px' }}
+                      className="flex gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors"
+                      style={{ borderLeft: `4px solid ${a.borderColor}`, paddingLeft: '12px' }}
                     >
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5" style={{ background: a.color }}>
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5"
+                        style={{ background: a.avatarColor }}
+                      >
                         {a.initials}
                       </div>
                       <div className="flex-1 min-w-0">

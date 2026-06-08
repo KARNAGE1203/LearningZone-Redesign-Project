@@ -3,8 +3,21 @@ import Login from './pages/Login';
 import MyCourses from './pages/MyCourses';
 import Home from './pages/Home';
 import CourseMaterials from './pages/CourseMaterials';
+import Grades from './pages/Grades';
+import Assessments from './pages/Assessments';
+import Resources from './pages/Resources';
+import CourseInfo from './pages/CourseInfo';
 
-type Page = 'courses' | 'dashboard' | 'materials';
+export type Page =
+  | 'courses'
+  | 'dashboard'
+  | 'materials'
+  | 'grades'
+  | 'assessments'
+  | 'resources'
+  | 'course-info';
+
+export type CoursePageNav = Exclude<Page, 'courses'>;
 
 function App() {
   const [userId, setUserId] = useState<string | null>(() => {
@@ -24,6 +37,10 @@ function App() {
     setPage('courses');
   }
 
+  function handleNavigate(p: CoursePageNav) {
+    setPage(p);
+  }
+
   if (!userId) {
     return <Login onSuccess={(id: string) => { setUserId(id); setPage('courses'); }} />;
   }
@@ -32,18 +49,31 @@ function App() {
     return <MyCourses onEnterCourse={() => setPage('dashboard')} />;
   }
 
+  const sharedProps = {
+    onLogout:     handleLogout,
+    onBackToHome: () => setPage('courses'),
+    onNavigate:   handleNavigate,
+  };
+
   if (page === 'dashboard') {
     return (
       <Home
         userId={userId}
-        onLogout={handleLogout}
-        onBackToHome={() => setPage('courses')}
+        {...sharedProps}
         onEnterCourse={() => setPage('materials')}
       />
     );
   }
 
-  return <CourseMaterials onBack={() => setPage('dashboard')} onLogout={handleLogout} />;
+  if (page === 'materials') {
+    return <CourseMaterials onBack={() => setPage('dashboard')} onLogout={handleLogout} />;
+  }
+
+  if (page === 'grades')      return <Grades      {...sharedProps} />;
+  if (page === 'assessments') return <Assessments {...sharedProps} />;
+  if (page === 'resources')   return <Resources   {...sharedProps} />;
+
+  return <CourseInfo {...sharedProps} />;
 }
 
 export default App;

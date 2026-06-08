@@ -423,12 +423,12 @@ export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
             <div className="relative min-w-[580px]">
 
               {/* Track line */}
-              <div className="absolute top-[38px] left-[12.5%] right-[12.5%] h-[3px] rounded-full bg-slate-100">
+              <div className="absolute top-[38px] left-[12.5%] right-[12.5%] h-[3px] rounded-full bg-slate-200">
                 <div
                   className="absolute top-0 left-0 h-full rounded-full"
                   style={{
-                    width: ready ? '100%' : '0%',
-                    background: 'linear-gradient(90deg, #0d8a7a 0%, #34d399 75%, #6ee7b7 100%)',
+                    width: ready ? '75%' : '0%',
+                    background: 'linear-gradient(90deg, #0d8a7a 0%, #34d399 100%)',
                     transition: 'width 1.5s cubic-bezier(0.16,1,0.3,1) 0.25s',
                   }}
                 />
@@ -461,16 +461,16 @@ export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
                             done
                               ? { background: '#0d8a7a', borderColor: '#0d8a7a' }
                               : {
-                                  background: 'white',
+                                  background: 'linear-gradient(135deg, #0d8a7a, #0a7a6c)',
                                   borderColor: '#0d8a7a',
-                                  boxShadow: '0 0 0 5px rgba(13,138,122,0.12)',
+                                  boxShadow: '0 0 0 5px rgba(13,138,122,0.2), 0 4px 16px rgba(13,138,122,0.4)',
                                 }
                           }
                         >
                           {done ? (
                             <CheckCircle2 className="w-6 h-6 text-white" strokeWidth={2.5} />
                           ) : (
-                            <span className="text-xs font-extrabold" style={{ color: '#0d8a7a' }}>67%</span>
+                            <span className="text-xs font-extrabold text-white">67%</span>
                           )}
                         </div>
                       </div>
@@ -589,7 +589,7 @@ export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
                 {COMMUNITIES.map(({ icon: Icon, name, sub, color, bg }) => (
                   <button
                     key={name}
-                    className="flex items-start gap-3 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm cursor-pointer transition-all duration-150 text-left group"
+                    className="flex items-start gap-3 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm cursor-pointer transition-all duration-150 text-left group w-full min-h-[100px]"
                   >
                     <div
                       className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
