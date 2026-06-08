@@ -9,8 +9,6 @@ designed and developed as a portfolio project for De Montfort University Dubai.
 
 [![Frontend — Netlify](https://img.shields.io/badge/Frontend-Netlify-00C7B7?logo=netlify&logoColor=white)](#)
 [![Backend — Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render&logoColor=white)](#)
-[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
-
 </div>
 
 ---
