@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import type { ComponentType } from 'react';
 import ReactPlayer from 'react-player';
 import { FileText, FlaskConical } from 'lucide-react';
+
+// Cast ReactPlayer to bypass broken forwardRef<HTMLVideoElement> inference
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Player = ReactPlayer as ComponentType<any>;
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -265,7 +270,7 @@ export function VideoPlayerModal({
             </div>
           )}
 
-          <ReactPlayer
+          <Player
             ref={playerRef}
             url={video.url}
             width="100%"
