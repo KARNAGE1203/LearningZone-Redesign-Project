@@ -123,44 +123,125 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
         {/* Scrollable body */}
         <main className="flex-1 overflow-y-auto">
 
-          {/* Hero banner */}
+          {/* Hero banner — OS & Networks course themed */}
           <div
-            className="relative overflow-hidden px-5 py-10 sm:px-8 sm:py-12 md:px-10 lg:py-14"
-            style={{ background: 'linear-gradient(130deg, #1e1b4b 0%, #312e81 55%, #3730a3 100%)' }}
+            className="relative overflow-hidden px-5 pt-10 pb-16 sm:px-8 sm:pt-12 sm:pb-20 md:px-10 lg:pt-14 lg:pb-20"
+            style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #27247a 40%, #3730a3 100%)' }}
           >
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -top-16 right-10 w-72 h-72 md:w-96 md:h-96 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(129,140,248,0.15), transparent 65%)' }} />
-              <div className="absolute -bottom-12 left-[38%] w-56 h-56 md:w-72 md:h-72 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(196,181,253,0.10), transparent 65%)' }} />
-              <svg className="absolute inset-0 w-full h-full opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
-                    <circle cx="1" cy="1" r="1" fill="white" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#dots)" />
+            {/* Network topology illustration — right panel */}
+            <div
+              className="absolute right-0 top-0 bottom-0 pointer-events-none"
+              style={{
+                width: '62%',
+                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 22%, black 48%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 22%, black 48%)',
+              }}
+            >
+              <svg
+                viewBox="0 0 500 240"
+                preserveAspectRatio="xMaxYMid slice"
+                className="w-full h-full"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Low-poly geometric facets */}
+                <polygon points="395,0 500,0 480,85"      fill="rgba(99,102,241,0.15)" />
+                <polygon points="480,85 500,0 500,155"    fill="rgba(79,70,229,0.20)" />
+                <polygon points="325,95 468,8 500,108"    fill="rgba(129,140,248,0.09)" />
+                <polygon points="408,140 500,162 492,240" fill="rgba(55,48,163,0.23)" />
+                <polygon points="348,188 468,152 500,240" fill="rgba(99,102,241,0.11)" />
+                <polygon points="265,68 358,8 428,88"     fill="rgba(139,92,246,0.09)" />
+                <polygon points="428,88 358,8 472,12"     fill="rgba(79,70,229,0.13)" />
+                <polygon points="285,148 362,192 428,152" fill="rgba(99,102,241,0.09)" />
+                <polygon points="215,128 308,78 275,168"  fill="rgba(67,56,202,0.11)" />
+                <polygon points="450,60 500,30 500,110"   fill="rgba(109,40,217,0.10)" />
+
+                {/* Connection lines */}
+                <line x1="352" y1="112" x2="282" y2="60"  stroke="rgba(165,180,252,0.28)" strokeWidth="1.5" />
+                <line x1="352" y1="112" x2="428" y2="66"  stroke="rgba(165,180,252,0.28)" strokeWidth="1.5" />
+                <line x1="352" y1="112" x2="446" y2="146" stroke="rgba(165,180,252,0.28)" strokeWidth="1.5" />
+                <line x1="352" y1="112" x2="296" y2="165" stroke="rgba(165,180,252,0.28)" strokeWidth="1.5" />
+                <line x1="352" y1="112" x2="225" y2="106" stroke="rgba(165,180,252,0.28)" strokeWidth="1.5" />
+                <line x1="352" y1="112" x2="470" y2="110" stroke="rgba(165,180,252,0.28)" strokeWidth="1.5" />
+                <line x1="282" y1="60"  x2="208" y2="50"  stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="282" y1="60"  x2="250" y2="120" stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="428" y1="66"  x2="406" y2="20"  stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="428" y1="66"  x2="506" y2="60"  stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="446" y1="146" x2="506" y2="150" stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="296" y1="165" x2="240" y2="190" stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="470" y1="110" x2="506" y2="60"  stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="470" y1="110" x2="554" y2="96"  stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="470" y1="110" x2="560" y2="160" stroke="rgba(165,180,252,0.22)" strokeWidth="1.2" />
+                <line x1="554" y1="96"  x2="560" y2="160" stroke="rgba(165,180,252,0.18)" strokeWidth="1" />
+                <line x1="225" y1="106" x2="250" y2="120" stroke="rgba(165,180,252,0.18)" strokeWidth="1" />
+
+                {/* Edge / client nodes */}
+                <circle cx="208" cy="50"  r="4.5" fill="rgba(139,92,246,0.38)"  stroke="rgba(196,181,253,0.52)" strokeWidth="1" />
+                <circle cx="250" cy="120" r="4.5" fill="rgba(139,92,246,0.38)"  stroke="rgba(196,181,253,0.52)" strokeWidth="1" />
+                <circle cx="406" cy="20"  r="4.5" fill="rgba(139,92,246,0.38)"  stroke="rgba(196,181,253,0.52)" strokeWidth="1" />
+                <circle cx="506" cy="60"  r="4.5" fill="rgba(139,92,246,0.38)"  stroke="rgba(196,181,253,0.52)" strokeWidth="1" />
+                <circle cx="506" cy="150" r="4.5" fill="rgba(139,92,246,0.38)"  stroke="rgba(196,181,253,0.52)" strokeWidth="1" />
+                <circle cx="240" cy="190" r="4.5" fill="rgba(139,92,246,0.38)"  stroke="rgba(196,181,253,0.52)" strokeWidth="1" />
+                <circle cx="554" cy="96"  r="4"   fill="rgba(139,92,246,0.32)"  stroke="rgba(196,181,253,0.45)" strokeWidth="1" />
+                <circle cx="560" cy="160" r="4"   fill="rgba(139,92,246,0.32)"  stroke="rgba(196,181,253,0.45)" strokeWidth="1" />
+
+                {/* Switch nodes */}
+                <circle cx="225" cy="106" r="7" fill="rgba(99,102,241,0.40)" stroke="rgba(165,180,252,0.58)" strokeWidth="1.5" />
+                <circle cx="470" cy="110" r="7" fill="rgba(99,102,241,0.40)" stroke="rgba(165,180,252,0.58)" strokeWidth="1.5" />
+
+                {/* Server nodes */}
+                <circle cx="282" cy="60"  r="9" fill="rgba(79,70,229,0.45)" stroke="rgba(165,180,252,0.62)" strokeWidth="1.5" />
+                <circle cx="428" cy="66"  r="9" fill="rgba(79,70,229,0.45)" stroke="rgba(165,180,252,0.62)" strokeWidth="1.5" />
+                <circle cx="446" cy="146" r="8" fill="rgba(79,70,229,0.42)" stroke="rgba(165,180,252,0.58)" strokeWidth="1.5" />
+                <circle cx="296" cy="165" r="8" fill="rgba(79,70,229,0.42)" stroke="rgba(165,180,252,0.58)" strokeWidth="1.5" />
+
+                {/* Core hub — outer glow rings + fill */}
+                <circle cx="352" cy="112" r="27" fill="none" stroke="rgba(165,180,252,0.09)" strokeWidth="10" />
+                <circle cx="352" cy="112" r="18" fill="none" stroke="rgba(165,180,252,0.18)" strokeWidth="2.5" />
+                <circle cx="352" cy="112" r="13" fill="rgba(99,102,241,0.55)" stroke="rgba(165,180,252,0.75)" strokeWidth="2" />
+                <circle cx="352" cy="112" r="5"  fill="rgba(196,181,253,0.9)" />
               </svg>
             </div>
+
+            {/* Text content */}
             <div
-              className="relative z-10 max-w-2xl"
+              className="relative z-10 max-w-lg"
               style={{
                 opacity:    ready ? 1 : 0,
                 transform:  ready ? 'translateY(0)' : 'translateY(-10px)',
                 transition: 'opacity 0.7s ease, transform 0.7s ease',
               }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold tracking-[0.18em] uppercase mb-4"
-                style={{ background: 'rgba(255,255,255,0.1)', color: '#a5b4fc' }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Block 4 · Summer 2026
-              </span>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight mb-3 tracking-tight">
-                Welcome back, Danish.
+              {/* Pill badges */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black tracking-[0.18em] uppercase"
+                  style={{ background: 'rgba(255,255,255,0.1)', color: '#a5b4fc' }}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Block 4 · Summer 2026
+                </span>
+                <span
+                  className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider"
+                  style={{
+                    background: 'rgba(99,102,241,0.28)',
+                    color:      'rgba(196,181,253,0.92)',
+                    border:     '1px solid rgba(165,180,252,0.22)',
+                  }}
+                >
+                  CTEC1704D
+                </span>
+              </div>
+
+              {/* Course name */}
+              <h1 className="text-2xl sm:text-3xl lg:text-[2.6rem] font-black text-white leading-[1.12] mb-3 tracking-tight">
+                Operating Systems<br />
+                <span style={{ color: '#a5b4fc' }}>&amp; Networks</span>
               </h1>
-              <p className="text-indigo-200/80 text-sm sm:text-base leading-relaxed">
-                Your academic overview is looking strong.{' '}
-                <span className="text-white font-semibold">2 upcoming deadlines</span> need your attention this week.
+
+              {/* Sub-line */}
+              <p className="text-indigo-200/75 text-sm leading-relaxed max-w-xs sm:max-w-sm">
+                Week 34 · Memory Management &amp; Virtual Memory.{' '}
+                <span className="text-white font-semibold">2 deadlines</span> need attention this week.
               </p>
             </div>
           </div>
