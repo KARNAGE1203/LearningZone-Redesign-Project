@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useNotifications } from '../context/NotificationContext';
-import { NOTIF_TYPES, type Notification, type NotificationType } from '../types/notification';
+import { NOTIF_TYPES, type Notification } from '../types/notification';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

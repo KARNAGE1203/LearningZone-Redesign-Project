@@ -443,7 +443,6 @@ export default function Home({ onEnterCourse, onContinueLearning }: HomeProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {TIMELINE.map(({ block, course, grade, status, abbr, color, accentBg }) => {
-              const done   = status === 'done';
               const active = status === 'active';
               const ringR  = 15;
               const ringC  = 2 * Math.PI * ringR;

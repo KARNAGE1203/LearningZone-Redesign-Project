@@ -56,7 +56,7 @@ export function VideoPlayerModal({
   totalCount   = 1,
 }: VideoPlayerModalProps) {
   const [mounted, setMounted] = useState(false);
-  const playerRef = useRef<ReactPlayer>(null);
+  const playerRef = useRef<InstanceType<typeof ReactPlayer>>(null);
 
   // ── Enter / exit animation ──────────────────────────────────────────────────
   useEffect(() => {
@@ -277,7 +277,6 @@ export function VideoPlayerModal({
                 playerVars: {
                   modestbranding: 1,
                   rel:            0,
-                  showinfo:       0,
                 },
               },
             }}
