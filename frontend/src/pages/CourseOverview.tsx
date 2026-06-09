@@ -10,6 +10,7 @@ import type { CoursePageNav } from '../App';
 
 interface CourseOverviewProps {
   onBack:     () => void;
+  onHome?:    () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
 
@@ -38,7 +39,7 @@ const TYPE_ICON: Record<string, { Icon: React.ElementType; color: string; bg: st
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function CourseOverview({ onBack, onNavigate }: CourseOverviewProps) {
+export default function CourseOverview({ onBack, onHome, onNavigate }: CourseOverviewProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function CourseOverview({ onBack, onNavigate }: CourseOverviewPro
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="course" activePage="overview" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="course" activePage="overview" onNavigate={onNavigate} onBack={onBack} onHome={onHome} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">

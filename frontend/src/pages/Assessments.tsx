@@ -10,6 +10,7 @@ import type { CoursePageNav } from '../App';
 
 interface AssessmentsProps {
   onBack:     () => void;
+  onHome?:    () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
 
@@ -28,13 +29,13 @@ const PAST_ASSESSMENTS = [
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function Assessments({ onBack, onNavigate }: AssessmentsProps) {
+export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsProps) {
   const [pastExpanded, setPastExpanded] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="course" activePage="assessments" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="course" activePage="assessments" onNavigate={onNavigate} onBack={onBack} onHome={onHome} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">

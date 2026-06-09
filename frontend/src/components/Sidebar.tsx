@@ -13,6 +13,7 @@ export interface SidebarProps {
   activePage: string;
   onNavigate: (page: CoursePageNav) => void;
   onBack:     () => void;
+  onHome?:    () => void;
 }
 
 // ─── Nav config ───────────────────────────────────────────────────────────────
@@ -38,6 +39,7 @@ function Content({
   activePage,
   onNavigate,
   onBack,
+  onHome,
   onClose,
 }: SidebarProps & { onClose?: () => void }) {
   const navItems = variant === 'student' ? STUDENT_NAV : COURSE_NAV;
@@ -48,9 +50,9 @@ function Content({
       {/* Logo — click navigates to Dashboard (home) */}
       <div className="px-5 pt-6 pb-4 flex items-center justify-between shrink-0">
         <button
-          onClick={() => { onBack(); onClose?.(); }}
+          onClick={() => { (onHome ?? onBack)(); onClose?.(); }}
           className="flex items-center gap-2.5 cursor-pointer rounded-xl px-1 py-1 -ml-1 transition-opacity duration-150 hover:opacity-75 active:opacity-60 text-left"
-          aria-label="Go to Dashboard"
+          aria-label="Go to Home"
         >
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
@@ -183,7 +185,7 @@ function Content({
 
 // ─── Exported Sidebar ─────────────────────────────────────────────────────────
 
-export function Sidebar({ variant, activePage, onNavigate, onBack }: SidebarProps) {
+export function Sidebar({ variant, activePage, onNavigate, onBack, onHome }: SidebarProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -193,7 +195,7 @@ export function Sidebar({ variant, activePage, onNavigate, onBack }: SidebarProp
     return () => mq.removeEventListener('change', h);
   }, []);
 
-  const cp = { variant, activePage, onNavigate, onBack };
+  const cp = { variant, activePage, onNavigate, onBack, onHome };
 
   return (
     <>

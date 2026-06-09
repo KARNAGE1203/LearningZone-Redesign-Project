@@ -11,6 +11,7 @@ import type { CoursePageNav } from '../App';
 interface ResourcesProps {
   onLogout?:  () => void;
   onBack:     () => void;
+  onHome?:    () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
 
@@ -84,11 +85,11 @@ const SUPPORT = [
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function Resources({ onBack, onNavigate }: ResourcesProps) {
+export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="course" activePage="resources" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="course" activePage="resources" onNavigate={onNavigate} onBack={onBack} onHome={onHome} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">

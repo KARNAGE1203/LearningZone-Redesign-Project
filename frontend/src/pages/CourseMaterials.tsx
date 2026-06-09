@@ -10,6 +10,7 @@ import type { CoursePageNav } from '../App';
 
 interface CourseMaterialsProps {
   onBack:     () => void;
+  onHome?:    () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
 
@@ -116,7 +117,7 @@ const FILTERS: FilterKey[] = ['All', 'Slides', 'Labs', 'Videos'];
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function CourseMaterials({ onBack, onNavigate }: CourseMaterialsProps) {
+export default function CourseMaterials({ onBack, onHome, onNavigate }: CourseMaterialsProps) {
   const [activeFilter,   setActiveFilter]   = useState<FilterKey>('All');
   const [expandedWeeks,  setExpandedWeeks]  = useState<Set<number>>(new Set([34]));
   const [materialSearch, setMaterialSearch] = useState('');
@@ -209,7 +210,7 @@ export default function CourseMaterials({ onBack, onNavigate }: CourseMaterialsP
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="course" activePage="materials" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="course" activePage="materials" onNavigate={onNavigate} onBack={onBack} onHome={onHome} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">

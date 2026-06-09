@@ -11,6 +11,7 @@ import type { CoursePageNav } from '../App';
 interface CourseInfoProps {
   onLogout?:  () => void;
   onBack:     () => void;
+  onHome?:    () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
 
@@ -40,7 +41,7 @@ const BLOCK_STEPS = [
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function CourseInfo({ onBack, onNavigate }: CourseInfoProps) {
+export default function CourseInfo({ onBack, onHome, onNavigate }: CourseInfoProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function CourseInfo({ onBack, onNavigate }: CourseInfoProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="course" activePage="course-info" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="course" activePage="course-info" onNavigate={onNavigate} onBack={onBack} onHome={onHome} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">

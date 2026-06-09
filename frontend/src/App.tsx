@@ -95,16 +95,18 @@ function App() {
 
     // Level 3: Course pages (course sidebar)
     const courseBack = () => setPage('dashboard');
+    const courseHome = () => setPage('home');
 
-    if (page === 'overview')    return <CourseOverview onBack={courseBack} onNavigate={handleNavigate} />;
-    if (page === 'materials')   return <CourseMaterials onBack={courseBack} onNavigate={handleNavigate} />;
-    if (page === 'assessments') return <Assessments    onBack={courseBack} onNavigate={handleNavigate} />;
-    if (page === 'resources')   return <Resources      onBack={courseBack} onNavigate={handleNavigate} />;
+    if (page === 'overview')    return <CourseOverview onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
+    if (page === 'materials')   return <CourseMaterials onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
+    if (page === 'assessments') return <Assessments    onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
+    if (page === 'resources')   return <Resources      onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
 
     // course-info
     return (
       <CourseInfo
         onBack={courseBack}
+        onHome={courseHome}
         onNavigate={handleNavigate}
         onLogout={handleLogout}
       />
