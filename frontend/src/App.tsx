@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Login from './pages/Login';
-import MyCourses from './pages/MyCourses';
 import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
 import CourseMaterials from './pages/CourseMaterials';
 import CourseOverview from './pages/CourseOverview';
 import Grades from './pages/Grades';
@@ -13,7 +13,7 @@ import { NotificationDrawer } from './components/NotificationDrawer';
 import { NotificationToast } from './components/NotificationToast';
 
 export type Page =
-  | 'courses'
+  | 'home'
   | 'dashboard'
   | 'grades'
   | 'notifications'
@@ -23,7 +23,7 @@ export type Page =
   | 'resources'
   | 'course-info';
 
-export type CoursePageNav = Exclude<Page, 'courses'>;
+export type CoursePageNav = Exclude<Page, 'home'>;
 
 function App() {
   const [userId, setUserId] = useState<string | null>(() => {
@@ -34,13 +34,13 @@ function App() {
       return null;
     }
   });
-  const [page, setPage] = useState<Page>('courses');
+  const [page, setPage] = useState<Page>('home');
 
   function handleLogout() {
     localStorage.removeItem('lz_token');
     localStorage.removeItem('lz_user');
     setUserId(null);
-    setPage('courses');
+    setPage('home');
   }
 
   function handleNavigate(p: CoursePageNav) {
@@ -48,15 +48,15 @@ function App() {
   }
 
   if (!userId) {
-    return <Login onSuccess={(id: string) => { setUserId(id); setPage('courses'); }} />;
+    return <Login onSuccess={(id: string) => { setUserId(id); setPage('home'); }} />;
   }
 
   // ── Render current page ───────────────────────────────────────────────────
   function renderPage() {
-    // Level 1: My Courses (top nav only)
-    if (page === 'courses') {
+    // Level 1: Home (top nav only)
+    if (page === 'home') {
       return (
-        <MyCourses
+        <Home
           onEnterCourse={() => setPage('dashboard')}
           onContinueLearning={() => setPage('materials')}
         />
@@ -66,9 +66,9 @@ function App() {
     // Level 2: Student pages (student sidebar)
     if (page === 'dashboard') {
       return (
-        <Home
+        <Dashboard
           userId={userId!}
-          onBack={() => setPage('courses')}
+          onBack={() => setPage('home')}
           onEnterCourse={() => setPage('overview')}
           onNavigate={handleNavigate}
         />
@@ -78,7 +78,7 @@ function App() {
     if (page === 'grades') {
       return (
         <Grades
-          onBack={() => setPage('courses')}
+          onBack={() => setPage('home')}
           onNavigate={handleNavigate}
         />
       );
@@ -87,7 +87,7 @@ function App() {
     if (page === 'notifications') {
       return (
         <Notifications
-          onBack={() => setPage('courses')}
+          onBack={() => setPage('home')}
           onNavigate={handleNavigate}
         />
       );

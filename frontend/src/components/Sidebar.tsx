@@ -91,7 +91,7 @@ function Content({
           }}
         >
           <ArrowLeft className="w-3.5 h-3.5 shrink-0" strokeWidth={2} />
-          {variant === 'student' ? 'Back to My Courses' : 'Back to Dashboard'}
+          {variant === 'student' ? 'Back to Home' : 'Back to Dashboard'}
         </button>
       </div>
 

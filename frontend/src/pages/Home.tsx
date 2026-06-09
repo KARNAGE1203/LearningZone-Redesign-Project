@@ -1,103 +1,156 @@
 import { useState, useEffect } from 'react';
 import {
-  Bell, Search, HelpCircle, ArrowRight,
-  Clock, FileText, MessageSquare, TrendingUp, AlertTriangle,
-  ChevronRight, Megaphone,
+  GraduationCap, Search, Bell, Settings, ArrowRight, CheckCircle2,
+  Globe, Mountain, Building2, CalendarDays, Library, Headphones,
+  Users, Megaphone, Calendar, ExternalLink, ChevronRight,
 } from 'lucide-react';
-import { Sidebar } from '../components/Sidebar';
-import { useNotifications } from '../context/NotificationContext';
 import { cn } from '../lib/utils';
-import type { CoursePageNav } from '../App';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { useNotifications } from '../context/NotificationContext';
 
 interface HomeProps {
-  userId:        string;
-  onBack:        () => void;
-  onEnterCourse: () => void;
-  onNavigate:    (page: CoursePageNav) => void;
+  onEnterCourse:      () => void;
+  onContinueLearning: () => void;
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+// ─── Static data ────────────────────────────────────────────────────────────
 
-const STATS = [
-  { label: 'Materials Available', value: '24',    sub: 'This week',         icon: FileText,      ring: '#0d8a7a', bg: '#f0fdf4', fg: '#059669' },
-  { label: 'Pending Items',       value: '3',     sub: 'Require attention', icon: Clock,         ring: '#f59e0b', bg: '#fffbeb', fg: '#d97706' },
-  { label: 'Phase Test 2',        value: '2 days', sub: 'Jun 2 · 14:00',   icon: AlertTriangle, ring: '#ef4444', bg: '#fef2f2', fg: '#dc2626' },
-];
+const NAV_LINKS = ['My Courses', 'Calendar', 'Library', 'Support'] as const;
 
-const DEADLINES = [
-  { month: 'JUN', day: '02', title: 'Phase Test 2', course: 'CTEC 1704D', daysLeft: 2,  urgent: true  },
-  { month: 'JUN', day: '05', title: 'Final Exam',   course: 'CTEC 1704D', daysLeft: 5,  urgent: false },
-  { month: 'JUN', day: '10', title: 'Lab Report',   course: 'CTEC 1704D', daysLeft: 10, urgent: false },
+const TIMELINE = [
+  { block: 1, course: 'Database Design',      grade: '68%', status: 'done'   as const, abbr: 'DB', color: '#0369a1', accentBg: '#e0f2fe' },
+  { block: 2, course: 'Fundamental CS',        grade: '74%', status: 'done'   as const, abbr: 'CS', color: '#7c3aed', accentBg: '#ede9fe' },
+  { block: 3, course: 'Computer Programming',  grade: '81%', status: 'done'   as const, abbr: 'CP', color: '#059669', accentBg: '#d1fae5' },
+  { block: 4, course: 'OS & Networks',         grade: '67%', status: 'active' as const, abbr: 'OS', color: '#0d8a7a', accentBg: '#ccfbf1' },
 ];
 
 const ANNOUNCEMENTS = [
-  { initials: 'MH', avatarColor: '#0d8a7a', borderColor: '#0d8a7a', title: 'Exam Schedule Released',   body: 'Midterm schedules are now available in the portal.',                              time: '1 hour ago' },
-  { initials: 'MA', avatarColor: '#0d8a7a', borderColor: '#7c3aed', title: 'New Reading Material',     body: 'Prof. Al-Ibaisi uploaded revision material for Phase Test 2.',                  time: 'Yesterday'  },
-  { initials: 'IT', avatarColor: '#64748b', borderColor: '#94a3b8', title: 'Campus Wi-Fi Maintenance', body: 'Network maintenance this Saturday 2–6 AM. Plan your submissions accordingly.',  time: '3 days ago' },
+  {
+    tag: 'DMU WIDE', tagColor: '#7c3aed', tagBg: '#f5f3ff',
+    title: 'DMU Support Fund — Applications Close June 12',
+    preview: 'Have you applied to the DMU Support Fund yet? The fund closes Friday 12th June at 5pm...',
+    time: 'Wed, 3 June · 2:08 PM', unread: true,
+  },
+  {
+    tag: 'DUBAI CAMPUS', tagColor: '#0369a1', tagBg: '#f0f9ff',
+    title: 'Block 4 Exam Schedule Released',
+    preview: 'The examination timetable for Block 4 has been published. Please review your assigned slots...',
+    time: 'Mon, 1 June', unread: true,
+  },
+  {
+    tag: 'STUDENT SERVICES', tagColor: '#047857', tagBg: '#f0fdf4',
+    title: 'Request for Professional Certifications Evidence',
+    preview: 'Students are requested to submit evidence of professional certifications and micro-credentials...',
+    time: '24 May', unread: false,
+  },
 ];
 
-const COURSE_MINI = [
-  { label: 'Materials', value: '24', icon: FileText, color: '#d97706', bg: '#fffbeb' },
-  { label: 'Pending',   value: '3',  icon: Clock,    color: '#ef4444', bg: '#fef2f2' },
+const COMMUNITIES = [
+  { icon: Globe,        name: 'Dubai Community',    sub: '342 members',                color: '#0369a1', bg: '#e0f2fe' },
+  { icon: Mountain,     name: 'BaseCamp',            sub: 'First year orientation hub', color: '#059669', bg: '#d1fae5' },
+  { icon: Building2,    name: 'Faculty of Tech',     sub: 'Arts & Culture 2023/27',     color: '#7c3aed', bg: '#ede9fe' },
+  { icon: CalendarDays, name: 'Pre-Induction 25/26', sub: 'Orientation resources',       color: '#d97706', bg: '#fef3c7' },
 ];
 
-const RING_R    = 30;
-const RING_C    = 2 * Math.PI * RING_R;
-const GRADE_PCT = 0.90;
+const CALENDAR_EVENTS = [
+  { day: '29', month: 'May', event: 'Phase Test 2',               chip: 'Assessment', chipColor: '#dc2626', chipBg: '#fef2f2' },
+  { day: '12', month: 'Jun', event: 'Block 4 Exams Close',        chip: 'Deadline',   chipColor: '#d97706', chipBg: '#fffbeb' },
+  { day: '20', month: 'Jun', event: 'Summer Break Begins',        chip: 'Term Date',  chipColor: '#0369a1', chipBg: '#eff6ff' },
+  { day: '01', month: 'Sep', event: 'Academic Year 2026/27',      chip: 'Term Date',  chipColor: '#0369a1', chipBg: '#eff6ff' },
+];
 
-// ─── Main component ───────────────────────────────────────────────────────────
+const QUICK_LINKS = [
+  { icon: Library,      label: 'Library',          color: '#7c3aed', bg: '#ede9fe' },
+  { icon: Headphones,   label: 'IT Support',       color: '#0369a1', bg: '#e0f2fe' },
+  { icon: GraduationCap,label: 'Academic Support', color: '#059669', bg: '#d1fae5' },
+  { icon: Building2,    label: 'MyDMU',            color: '#d97706', bg: '#fef3c7' },
+];
 
-export default function Home({ userId: _userId, onBack, onEnterCourse, onNavigate }: HomeProps) {
+const ACTIVE_RING_R = 48;
+const ACTIVE_RING_C = 2 * Math.PI * ACTIVE_RING_R;
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+export default function Home({ onEnterCourse, onContinueLearning }: HomeProps) {
+  const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
-  const [ready,  setReady]  = useState(false);
   const { unreadCount, openDrawer } = useNotifications();
 
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 250);
+    const t = setTimeout(() => setReady(true), 200);
     return () => clearTimeout(t);
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-100" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div
+      className="min-h-screen"
+      style={{ background: '#f4f2ee', fontFamily: 'Inter, system-ui, sans-serif' }}
+    >
 
-      <Sidebar variant="student" activePage="dashboard" onNavigate={onNavigate} onBack={onBack} />
+      {/* ══════════════════════════════════════════════════════════
+          TOP NAVIGATION
+      ══════════════════════════════════════════════════════════ */}
+      <header
+        className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80"
+        style={{ boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}
+      >
+        <div className="max-w-screen-2xl mx-auto px-6 lg:px-10 h-16 flex items-center gap-5">
 
-      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+          {/* Logo — click scrolls to top (home) */}
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2.5 shrink-0 cursor-pointer transition-opacity hover:opacity-75 active:opacity-50"
+            aria-label="Go to home"
+          >
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ background: '#0d8a7a' }}
+            >
+              <GraduationCap className="w-4 h-4 text-white" strokeWidth={2.2} />
+            </div>
+            <span className="font-bold text-slate-900 text-[15px] tracking-tight">LearningZone</span>
+          </button>
 
-        {/* Top Navbar */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center gap-3 px-4 md:px-6 lg:px-8 shrink-0 z-20">
+          <div className="w-px h-5 bg-slate-200 shrink-0" />
 
-          <div className="hidden md:flex items-center gap-2 text-sm shrink-0 min-w-0">
-            <span className="text-slate-400 hover:text-slate-600 cursor-pointer transition-colors whitespace-nowrap">My Courses</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-            <span className="text-slate-700 font-semibold truncate max-w-[200px] lg:max-w-[320px]">
-              CTEC1704D: Operating Systems and Networks
-            </span>
-          </div>
+          {/* Centre nav */}
+          <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
+            {NAV_LINKS.map((link) => (
+              <button
+                key={link}
+                className={cn(
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer',
+                  link === 'My Courses'
+                    ? 'bg-teal-50 text-teal-800 font-semibold'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                )}
+              >
+                {link}
+              </button>
+            ))}
+          </nav>
 
-          <div className="flex-1 relative max-w-xs sm:max-w-sm md:max-w-md mx-auto md:mx-4 lg:mx-auto">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search courses, materials…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 rounded-xl bg-slate-100 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:bg-white focus:ring-2 focus:ring-teal-400/25 border border-transparent focus:border-teal-300 transition-all duration-150"
-            />
-          </div>
+          {/* Right side */}
+          <div className="flex items-center gap-2 ml-auto shrink-0">
+            <div className="relative hidden lg:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search courses, announcements..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-60 xl:w-72 h-9 pl-9 pr-4 rounded-lg bg-slate-100 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:bg-white focus:ring-2 focus:ring-teal-400/25 border border-transparent focus:border-teal-300 transition-all"
+              />
+            </div>
 
-          <div className="flex items-center gap-1 shrink-0 ml-auto md:ml-0">
             <button
               onClick={openDrawer}
-              className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
+              className="relative w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5" strokeWidth={1.8} />
+              <Bell className="w-4 h-4" strokeWidth={1.8} />
               {unreadCount > 0 && (
                 <span
-                  className="absolute top-1.5 right-1.5 flex items-center justify-center text-white font-bold leading-none"
+                  className="absolute top-1 right-1 flex items-center justify-center text-white font-bold leading-none"
                   style={{
                     minWidth:     unreadCount > 9 ? 18 : 14,
                     height:       14,
@@ -112,314 +165,614 @@ export default function Home({ userId: _userId, onBack, onEnterCourse, onNavigat
                 </span>
               )}
             </button>
+
+            <button className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: 'linear-gradient(135deg, #7c3aed, #0d8a7a)' }}
+              >
+                <span className="text-white text-[10px] font-bold">DS</span>
+              </div>
+              <span className="hidden lg:block text-sm font-medium text-slate-700">Danish Saini</span>
+            </button>
+
             <button
-              className="hidden sm:flex w-10 h-10 rounded-xl items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
-              aria-label="Help"
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors"
+              aria-label="Settings"
             >
-              <HelpCircle className="w-5 h-5" strokeWidth={1.8} />
+              <Settings className="w-4 h-4" strokeWidth={1.8} />
             </button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Scrollable body */}
-        <main className="flex-1 overflow-y-auto">
-
-          {/* Hero banner */}
+      {/* ══════════════════════════════════════════════════════════
+          HERO BANNER
+      ══════════════════════════════════════════════════════════ */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(140deg, #1a0a2e 0%, #2d1b69 38%, #0d3b38 78%, #0a5f53 100%)',
+          minHeight: 200,
+        }}
+      >
+        {/* Texture + blobs */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.05 }} xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="hero-dots" width="48" height="48" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="0.9" fill="white" />
+                <circle cx="24" cy="24" r="0.5" fill="white" />
+                <circle cx="44" cy="8" r="0.6" fill="white" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-dots)" />
+          </svg>
           <div
-            className="relative overflow-hidden px-5 py-10 sm:px-8 sm:py-12 md:px-10 lg:py-14"
-            style={{ background: 'linear-gradient(130deg, #1e1b4b 0%, #312e81 55%, #3730a3 100%)' }}
-          >
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -top-16 right-10 w-72 h-72 md:w-96 md:h-96 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(129,140,248,0.15), transparent 65%)' }} />
-              <div className="absolute -bottom-12 left-[38%] w-56 h-56 md:w-72 md:h-72 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(196,181,253,0.10), transparent 65%)' }} />
-              <svg className="absolute inset-0 w-full h-full opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
-                    <circle cx="1" cy="1" r="1" fill="white" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#dots)" />
-              </svg>
-            </div>
+            className="absolute -top-20 right-1/4 w-[420px] h-[300px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.22), transparent 70%)' }}
+          />
+          <div
+            className="absolute bottom-0 right-10 w-72 h-56 rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(13,138,122,0.2), transparent 70%)' }}
+          />
+          <div
+            className="absolute top-1/2 left-[35%] w-48 h-48 rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.1), transparent 70%)' }}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-screen-2xl mx-auto px-6 lg:px-10 py-12 lg:py-16">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+
+            {/* Left */}
             <div
-              className="relative z-10 max-w-2xl"
               style={{
-                opacity:    ready ? 1 : 0,
-                transform:  ready ? 'translateY(0)' : 'translateY(-10px)',
+                opacity: ready ? 1 : 0,
+                transform: ready ? 'translateY(0)' : 'translateY(-12px)',
                 transition: 'opacity 0.7s ease, transform 0.7s ease',
               }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold tracking-[0.18em] uppercase mb-4"
-                style={{ background: 'rgba(255,255,255,0.1)', color: '#a5b4fc' }}>
+              <div className="flex items-center gap-2 mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Block 4 · Summer 2026
-              </span>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight mb-3 tracking-tight">
+                <span
+                  className="text-[11px] font-bold tracking-[0.2em] uppercase"
+                  style={{ color: '#a78bfa' }}
+                >
+                  Academic Year 2025/26 · Block 4 of 4
+                </span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-white leading-tight mb-3 tracking-tight">
                 Welcome back, Danish.
               </h1>
-              <p className="text-indigo-200/80 text-sm sm:text-base leading-relaxed">
-                Your academic overview is looking strong.{' '}
-                <span className="text-white font-semibold">2 upcoming deadlines</span> need your attention this week.
+              <p className="text-purple-200/75 text-base sm:text-lg leading-relaxed max-w-lg">
+                You are in your{' '}
+                <span className="font-semibold" style={{ color: '#fbbf24' }}>final block of the year.</span>
+                {' '}One active module, 3 completed. Keep going.
               </p>
             </div>
-          </div>
 
-          {/* Stats row — overlaps hero */}
-          <div className="px-4 sm:px-6 lg:px-8 -mt-5 relative z-10 mb-5 md:mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              {STATS.map(({ label, value, sub, icon: Icon, ring, bg, fg }, i) => (
+            {/* Right stat chips */}
+            <div
+              className="flex flex-wrap lg:flex-col items-start lg:items-end gap-3"
+              style={{
+                opacity: ready ? 1 : 0,
+                transform: ready ? 'translateX(0)' : 'translateX(16px)',
+                transition: 'opacity 0.7s ease 0.12s, transform 0.7s ease 0.12s',
+              }}
+            >
+              {[
+                { label: '4 Blocks This Year', dot: '#a78bfa' },
+                { label: '3 Completed',         dot: '#34d399' },
+                { label: '1 Active Now',         dot: '#fbbf24' },
+              ].map(({ label, dot }) => (
                 <div
                   key={label}
-                  className="bg-white rounded-2xl p-4 sm:p-5 shadow-lg border border-slate-100 cursor-default hover:shadow-xl hover:-translate-y-1"
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl"
                   style={{
-                    borderTop:  `3px solid ${ring}`,
-                    opacity:    ready ? 1 : 0,
-                    transform:  ready ? 'translateY(0) scale(1)' : 'translateY(28px) scale(0.97)',
-                    transition: `opacity 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 110}ms, transform 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 110}ms, box-shadow 0.2s ease`,
+                    background: 'rgba(255,255,255,0.09)',
+                    border: '1px solid rgba(255,255,255,0.14)',
+                    backdropFilter: 'blur(6px)',
                   }}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <p className="text-[10px] font-bold tracking-[0.15em] uppercase text-slate-400">{label}</p>
-                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: bg }}>
-                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: fg }} />
-                    </div>
-                  </div>
-                  <p className="text-2xl sm:text-3xl font-extrabold leading-none" style={{ color: fg }}>{value}</p>
-                  <p className="text-[11px] text-slate-400 mt-1.5 leading-tight">{sub}</p>
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dot }} />
+                  <span className="text-sm font-semibold text-white whitespace-nowrap">{label}</span>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Main content grid */}
-          <div className="px-4 sm:px-6 lg:px-8 pb-10 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+      {/* ══════════════════════════════════════════════════════════
+          MAIN CONTENT
+      ══════════════════════════════════════════════════════════ */}
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-10 py-8 lg:py-10 space-y-8 lg:space-y-10">
 
-            {/* ── LEFT: 2/3 ── */}
-            <div className="lg:col-span-2 space-y-4 sm:space-y-5 lg:space-y-6">
+        {/* ── SECTION 2: ACTIVE COURSE ──────────────────────── */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-bold tracking-[0.18em] uppercase text-slate-500">Active Now</span>
+          </div>
 
-              {/* Active Course card */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-                <div className="h-1.5 w-full" style={{ background: 'linear-gradient(90deg, #0d8a7a, #34d399)' }} />
+          <div
+            className="relative overflow-hidden rounded-2xl"
+            style={{
+              background: 'linear-gradient(130deg, #0d1b2a 0%, #1a2744 55%, #0d3b38 100%)',
+              boxShadow: '0 20px 60px -10px rgba(13,59,56,0.5)',
+            }}
+          >
+            {/* Card texture */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.035 }}>
+                <defs>
+                  <pattern id="card-dots" width="22" height="22" patternUnits="userSpaceOnUse">
+                    <circle cx="1" cy="1" r="0.8" fill="white" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#card-dots)" />
+              </svg>
+              <div
+                className="absolute -top-20 -right-16 w-72 h-72 rounded-full"
+                style={{ background: 'radial-gradient(circle, rgba(13,138,122,0.14), transparent 70%)' }}
+              />
+            </div>
 
-                <div className="p-5 sm:p-6 lg:p-7">
-                  <div className="flex items-start justify-between gap-4 mb-5">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="text-[10px] font-bold tracking-[0.15em] uppercase text-slate-400">Active Course</span>
-                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 tracking-wider">
-                          CTEC 1704D
-                        </span>
-                      </div>
-                      <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug mb-1.5">
-                        Operating Systems and Networks
-                      </h2>
-                      <p className="text-sm font-semibold" style={{ color: '#0d8a7a' }}>
-                        Prof. Muhammad Al-Ibaisi · MWF 10:00 AM
-                      </p>
-                    </div>
+            <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+              <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-12">
 
-                    {/* SVG grade ring */}
-                    <div className="relative shrink-0 w-[68px] h-[68px] sm:w-[76px] sm:h-[76px] flex items-center justify-center">
-                      <svg width="100%" height="100%" viewBox="0 0 70 70" style={{ position: 'absolute', transform: 'rotate(-90deg)' }}>
-                        <circle cx="35" cy="35" r={RING_R} fill="none" stroke="#f1f5f9" strokeWidth="5" />
-                        <circle
-                          cx="35" cy="35" r={RING_R}
-                          fill="none" stroke="#0d8a7a" strokeWidth="5" strokeLinecap="round"
-                          strokeDasharray={RING_C}
-                          strokeDashoffset={ready ? RING_C * (1 - GRADE_PCT) : RING_C}
-                          style={{ transition: 'stroke-dashoffset 1.8s cubic-bezier(0.16, 1, 0.3, 1)' }}
-                        />
-                      </svg>
-                      <span className="relative z-10 text-lg sm:text-[20px] font-extrabold" style={{ color: '#0d8a7a' }}>A-</span>
-                    </div>
+                {/* Left */}
+                <div className="flex-1 min-w-0">
+                  {/* Chips */}
+                  <div className="flex flex-wrap items-center gap-2.5 mb-4">
+                    <span
+                      className="text-[10px] font-bold tracking-[0.16em] uppercase px-3 py-1 rounded-lg"
+                      style={{
+                        background: 'rgba(13,138,122,0.22)',
+                        color: '#5eead4',
+                        border: '1px solid rgba(13,138,122,0.3)',
+                      }}
+                    >
+                      CTEC1704D_2025_604
+                    </span>
+                    <span
+                      className="text-[10px] font-bold tracking-[0.12em] uppercase px-3 py-1 rounded-lg"
+                      style={{
+                        background: 'rgba(239,68,68,0.18)',
+                        color: '#fca5a5',
+                        border: '1px solid rgba(239,68,68,0.28)',
+                      }}
+                    >
+                      Phase Test 2 · Due Tomorrow
+                    </span>
                   </div>
 
-                  {/* Mini metrics — 2 cards */}
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-5 sm:mb-6">
-                    {COURSE_MINI.map(({ label, value, icon: Icon, color, bg }) => (
-                      <div key={label} className="rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3.5" style={{ background: bg }}>
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/60 flex items-center justify-center shrink-0">
-                          <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
-                        </div>
-                        <div>
-                          <p className="text-base sm:text-xl font-extrabold text-slate-900 leading-none">{value}</p>
-                          <p className="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">{label}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-snug mb-2 tracking-tight">
+                    Operating Systems and Networks
+                  </h2>
+                  <p className="text-sm font-medium mb-7" style={{ color: 'rgba(94,234,212,0.75)' }}>
+                    Prof. Muhammad Al-Ibaisi · MWF 10:00 AM
+                  </p>
 
-                  {/* Progress bar */}
-                  <div className="mb-5 sm:mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-semibold text-slate-600">Course Progress</span>
-                      <span className="text-sm font-extrabold text-slate-800">55%</span>
+                  {/* Progress */}
+                  <div className="mb-8">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-sm font-semibold text-slate-400">Course Progress</span>
+                      <span className="text-sm font-extrabold text-white">67%</span>
                     </div>
-                    <div className="w-full h-2.5 sm:h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
                       <div
                         className="h-full rounded-full"
                         style={{
-                          width:      ready ? '55%' : '0%',
+                          width: ready ? '67%' : '0%',
                           background: 'linear-gradient(90deg, #0d8a7a, #34d399)',
-                          transition: 'width 1.8s cubic-bezier(0.16, 1, 0.3, 1)',
-                          boxShadow:  ready ? '0 0 10px rgba(52,211,153,0.4)' : 'none',
+                          boxShadow: ready ? '0 0 14px rgba(52,211,153,0.4)' : 'none',
+                          transition: 'width 1.8s cubic-bezier(0.16,1,0.3,1)',
                         }}
                       />
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-slate-400">Week 8 of 14</span>
-                      <span className="text-xs text-slate-400">6 weeks remaining</span>
-                    </div>
+                    <p className="text-xs mt-1.5" style={{ color: 'rgba(148,163,184,0.6)' }}>
+                      Week 9 of 14 · 5 weeks remaining
+                    </p>
                   </div>
 
-                  {/* Actions */}
+                  {/* CTAs */}
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       onClick={onEnterCourse}
-                      className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97]"
-                      style={{ background: '#0d8a7a', boxShadow: '0 4px 12px rgba(13,138,122,0.28)' }}
+                      className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97]"
+                      style={{ background: '#0d8a7a', boxShadow: '0 6px 20px rgba(13,138,122,0.4)' }}
                     >
-                      Continue Learning
+                      Go to Course
                       <ArrowRight className="w-4 h-4" />
                     </button>
-                    <button className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-all duration-150 active:scale-[0.97]">
-                      View Syllabus
-                    </button>
-                    <button className="hidden sm:flex ml-auto items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer transition-colors">
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      Grade History
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Reading List + Discussion Board */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
-
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6 cursor-pointer group hover:shadow-md hover:-translate-y-1 transition-all duration-200">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 sm:mb-5"
-                    style={{ background: 'linear-gradient(135deg, #fffbeb, #fef3c7)' }}>
-                    <FileText className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: '#d97706' }} />
-                  </div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <h3 className="font-bold text-slate-800">Reading List</h3>
-                    <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">3 new</span>
-                  </div>
-                  <p className="text-sm text-slate-500 leading-relaxed mb-4 sm:mb-5">
-                    3 new articles added for Week 8 discussion.
-                  </p>
-                  <div className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 group-hover:gap-3" style={{ color: '#0d8a7a' }}>
-                    View articles
-                    <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6 cursor-pointer group hover:shadow-md hover:-translate-y-1 transition-all duration-200">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 sm:mb-5"
-                    style={{ background: 'linear-gradient(135deg, #f5f3ff, #ede9fe)' }}>
-                    <MessageSquare className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: '#7c3aed' }} />
-                  </div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <h3 className="font-bold text-slate-800">Discussion Board</h3>
-                    <span className="text-[10px] font-bold bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">2 replies</span>
-                  </div>
-                  <p className="text-sm text-slate-500 leading-relaxed mb-4 sm:mb-5">
-                    2 replies to your post on "Heuristic Evaluation".
-                  </p>
-                  <div className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 group-hover:gap-3" style={{ color: '#0d8a7a' }}>
-                    View discussion
-                    <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ── RIGHT: 1/3 ── */}
-            <div className="lg:col-span-1 space-y-4 sm:space-y-5 lg:space-y-6">
-
-              {/* Upcoming Deadlines */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-4 sm:mb-5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
-                    </div>
-                    <h3 className="font-bold text-slate-800">Upcoming Deadlines</h3>
-                  </div>
-                  <button className="text-xs font-semibold cursor-pointer hover:underline" style={{ color: '#0d8a7a' }}>
-                    View all
-                  </button>
-                </div>
-
-                <div className="space-y-2.5 sm:space-y-3">
-                  {DEADLINES.map((d, i) => (
-                    <div key={i} className="flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors">
-                      <div
-                        className="flex flex-col items-center justify-center w-11 h-13 sm:w-12 sm:h-14 rounded-xl shrink-0 text-white"
-                        style={{ background: d.urgent ? '#ef4444' : '#334155', boxShadow: d.urgent ? '0 4px 10px rgba(239,68,68,0.28)' : 'none' }}
-                      >
-                        <span className="text-[9px] font-extrabold uppercase tracking-wider leading-none">{d.month}</span>
-                        <span className="text-xl font-extrabold leading-tight">{d.day}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate">{d.title}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{d.course}</p>
-                        <span className={cn(
-                          'inline-flex mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full',
-                          d.urgent ? 'bg-red-50 text-red-600' : d.daysLeft <= 7 ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-500'
-                        )}>
-                          In {d.daysLeft} {d.daysLeft === 1 ? 'day' : 'days'}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <button className="w-full mt-4 py-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-slate-300 rounded-xl">
-                  View Full Calendar
-                </button>
-              </div>
-
-              {/* Recent Announcements */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-4 sm:mb-5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                      <Megaphone className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
-                    </div>
-                    <h3 className="font-bold text-slate-800">Recent Announcements</h3>
-                  </div>
-                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-50 text-red-600">3 new</span>
-                </div>
-                <div className="space-y-2.5 sm:space-y-3">
-                  {ANNOUNCEMENTS.map((a, i) => (
-                    <div
-                      key={i}
-                      className="flex gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors"
-                      style={{ borderLeft: `4px solid ${a.borderColor}`, paddingLeft: '12px' }}
+                    <button
+                      onClick={onContinueLearning}
+                      className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150 active:scale-[0.97]"
+                      style={{
+                        background: 'rgba(255,255,255,0.08)',
+                        color: 'rgba(255,255,255,0.85)',
+                        border: '1px solid rgba(255,255,255,0.16)',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
                     >
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5"
-                        style={{ background: a.avatarColor }}
-                      >
-                        {a.initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 leading-snug">{a.title}</p>
-                        <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">{a.body}</p>
-                        <p className="text-[10px] text-slate-300 mt-1.5 font-medium">{a.time}</p>
-                      </div>
+                      Continue Learning
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right: SVG ring */}
+                <div className="hidden lg:flex flex-col items-center gap-2 shrink-0">
+                  <div className="relative w-28 h-28">
+                    <svg
+                      width="112" height="112" viewBox="0 0 112 112"
+                      style={{ position: 'absolute', transform: 'rotate(-90deg)' }}
+                    >
+                      <circle cx="56" cy="56" r={ACTIVE_RING_R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="6" />
+                      <circle
+                        cx="56" cy="56" r={ACTIVE_RING_R}
+                        fill="none" stroke="#0d8a7a" strokeWidth="6" strokeLinecap="round"
+                        strokeDasharray={ACTIVE_RING_C}
+                        strokeDashoffset={ready ? ACTIVE_RING_C * (1 - 0.67) : ACTIVE_RING_C}
+                        style={{
+                          transition: 'stroke-dashoffset 1.8s cubic-bezier(0.16,1,0.3,1)',
+                          filter: 'drop-shadow(0 0 6px rgba(13,138,122,0.65))',
+                        }}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-2xl font-extrabold text-white">67%</span>
+                      <span className="text-[10px] font-semibold" style={{ color: '#5eead4' }}>complete</span>
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
-
             </div>
           </div>
-        </main>
+        </div>
+
+        {/* ── SECTION 3: COURSE CARDS (Academic Year timeline) ── */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-bold tracking-[0.18em] uppercase text-slate-500">
+              Academic Year 2025/26
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {TIMELINE.map(({ block, course, grade, status, abbr, color, accentBg }) => {
+              const done   = status === 'done';
+              const active = status === 'active';
+              const ringR  = 15;
+              const ringC  = 2 * Math.PI * ringR;
+
+              /* ── Active card (dark / teal) ─────────────────── */
+              if (active) return (
+                <div
+                  key={block}
+                  className="rounded-2xl overflow-hidden flex flex-col"
+                  style={{
+                    background:   'linear-gradient(145deg, #0d1b2a 0%, #0d3b38 100%)',
+                    border:       '1.5px solid rgba(13,138,122,0.5)',
+                    boxShadow:    '0 8px 32px rgba(13,138,122,0.22)',
+                  }}
+                >
+                  {/* Teal glow top bar */}
+                  <div className="h-1" style={{ background: 'linear-gradient(90deg, #0d8a7a, #34d399)' }} />
+
+                  <div className="p-5 flex flex-col flex-1">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span
+                        className="text-[10px] font-extrabold tracking-[0.18em] uppercase"
+                        style={{ color: '#5eead4' }}
+                      >
+                        Block {block}
+                      </span>
+                      <div
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold"
+                        style={{
+                          background: 'rgba(13,138,122,0.2)',
+                          color:      '#5eead4',
+                          border:     '1px solid rgba(94,234,212,0.18)',
+                        }}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse shrink-0" />
+                        Active
+                      </div>
+                    </div>
+
+                    {/* Course avatar + name */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] font-extrabold text-white shrink-0"
+                        style={{ background: 'rgba(13,138,122,0.35)', border: '1px solid rgba(94,234,212,0.2)' }}
+                      >
+                        {abbr}
+                      </div>
+                      <h4 className="text-sm font-bold text-white leading-snug">{course}</h4>
+                    </div>
+
+                    {/* Grade + mini progress ring */}
+                    <div className="flex items-end justify-between mb-5">
+                      <div>
+                        <p className="text-2xl font-extrabold text-white leading-none">{grade}</p>
+                        <p className="text-[11px] mt-0.5 font-medium" style={{ color: 'rgba(94,234,212,0.6)' }}>
+                          In Progress
+                        </p>
+                      </div>
+                      <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: 'rotate(-90deg)' }}>
+                        <circle cx="19" cy="19" r={ringR} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
+                        <circle
+                          cx="19" cy="19" r={ringR}
+                          fill="none" stroke="#0d8a7a" strokeWidth="3.5" strokeLinecap="round"
+                          strokeDasharray={ringC}
+                          strokeDashoffset={ready ? ringC * 0.33 : ringC}
+                          style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16,1,0.3,1) 0.3s', filter: 'drop-shadow(0 0 4px rgba(13,138,122,0.7))' }}
+                        />
+                      </svg>
+                    </div>
+
+                    {/* CTAs */}
+                    <div className="flex gap-2 mt-auto">
+                      <button
+                        onClick={onEnterCourse}
+                        className="flex-1 py-2 text-xs font-bold text-white rounded-xl transition-all duration-150 hover:brightness-110 active:scale-[0.97] cursor-pointer"
+                        style={{ background: '#0d8a7a', boxShadow: '0 4px 14px rgba(13,138,122,0.38)' }}
+                      >
+                        Go to Course →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+
+              /* ── Completed card (white) ─────────────────────── */
+              return (
+                <div
+                  key={block}
+                  onClick={onEnterCourse}
+                  className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer group"
+                >
+                  {/* Coloured top bar */}
+                  <div className="h-1 transition-opacity group-hover:opacity-90" style={{ background: color }} />
+
+                  <div className="p-5 flex flex-col flex-1">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span
+                        className="text-[10px] font-extrabold tracking-[0.18em] uppercase"
+                        style={{ color }}
+                      >
+                        Block {block}
+                      </span>
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: accentBg }}
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" style={{ color }} strokeWidth={2.5} />
+                      </div>
+                    </div>
+
+                    {/* Course avatar + name */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] font-extrabold shrink-0"
+                        style={{ background: accentBg, color }}
+                      >
+                        {abbr}
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800 leading-snug">{course}</h4>
+                    </div>
+
+                    {/* Grade + completed badge */}
+                    <div className="flex items-end justify-between mb-5">
+                      <div>
+                        <p className="text-2xl font-extrabold leading-none" style={{ color }}>
+                          {grade}
+                        </p>
+                        <p className="text-[11px] mt-0.5 text-slate-400 font-medium">Final Grade</p>
+                      </div>
+                      <span
+                        className="text-[9px] font-extrabold tracking-[0.1em] uppercase px-2.5 py-1 rounded-full"
+                        style={{ background: accentBg, color }}
+                      >
+                        Completed
+                      </span>
+                    </div>
+
+                    {/* CTA */}
+                    <button
+                      className="mt-auto w-full py-2 text-xs font-semibold rounded-xl transition-colors duration-150 cursor-pointer"
+                      style={{
+                        background: accentBg,
+                        color,
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(0.93)')}
+                      onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
+                    >
+                      View Course →
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── SECTION 4: TWO-COLUMN LAYOUT ───────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+
+          {/* ── LEFT (2/3) ─────────────────────── */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* University Announcements */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <Megaphone className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
+                </div>
+                <h3 className="font-bold text-slate-800">University Announcements</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 ml-auto">
+                  2 unread
+                </span>
+              </div>
+
+              <div className="divide-y divide-slate-50">
+                {ANNOUNCEMENTS.map((a, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-4 py-4 first:pt-0 last:pb-0 cursor-pointer group hover:bg-slate-50 -mx-2 px-2 rounded-xl transition-colors"
+                  >
+                    <div className="mt-2 shrink-0 w-2">
+                      {a.unread && <span className="w-2 h-2 rounded-full bg-teal-500 block" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                        <span
+                          className="text-[9px] font-extrabold tracking-[0.14em] uppercase px-2 py-0.5 rounded"
+                          style={{ background: a.tagBg, color: a.tagColor }}
+                        >
+                          {a.tag}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium">{a.time}</span>
+                      </div>
+                      <p className={cn(
+                        'text-sm font-semibold leading-snug mb-1',
+                        a.unread ? 'text-slate-900' : 'text-slate-600'
+                      )}>
+                        {a.title}
+                      </p>
+                      <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{a.preview}</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 shrink-0 mt-1 transition-colors" />
+                  </div>
+                ))}
+              </div>
+
+              <button className="mt-4 w-full py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-teal-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-teal-300 rounded-xl">
+                View All Announcements
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* My Communities */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
+                </div>
+                <h3 className="font-bold text-slate-800">My Communities</h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {COMMUNITIES.map(({ icon: Icon, name, sub, color, bg }) => (
+                  <button
+                    key={name}
+                    className="flex items-start gap-3 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm cursor-pointer transition-all duration-150 text-left group w-full min-h-[100px]"
+                  >
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: bg }}
+                    >
+                      <Icon className="w-4 h-4" style={{ color }} strokeWidth={1.8} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{name}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 truncate">{sub}</p>
+                      <span
+                        className="text-[10px] font-semibold mt-1.5 inline-block transition-colors group-hover:text-teal-600"
+                        style={{ color: '#94a3b8' }}
+                      >
+                        View →
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── RIGHT (1/3) ────────────────────── */}
+          <div className="lg:col-span-1 space-y-6">
+
+            {/* Academic Calendar */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
+                </div>
+                <h3 className="font-bold text-slate-800">Academic Calendar</h3>
+              </div>
+
+              <div className="space-y-2">
+                {CALENDAR_EVENTS.map(({ day, month, event, chip, chipColor, chipBg }, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors group"
+                  >
+                    <div
+                      className="flex flex-col items-center justify-center w-12 h-[52px] rounded-xl shrink-0 text-white"
+                      style={{ background: 'linear-gradient(135deg, #334155, #1e293b)' }}
+                    >
+                      <span className="text-[9px] font-extrabold uppercase tracking-wider leading-none">{month}</span>
+                      <span className="text-xl font-extrabold leading-tight">{day}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{event}</p>
+                      <span
+                        className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                        style={{ background: chipBg, color: chipColor }}
+                      >
+                        {chip}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors" />
+                  </div>
+                ))}
+              </div>
+
+              <button className="mt-4 w-full py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-teal-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-teal-300 rounded-xl">
+                View Full Calendar
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Quick Links */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <ExternalLink className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
+                </div>
+                <h3 className="font-bold text-slate-800">Quick Links</h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {QUICK_LINKS.map(({ icon: Icon, label, color, bg }) => (
+                  <button
+                    key={label}
+                    className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm cursor-pointer transition-all duration-150 group text-left"
+                  >
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: bg }}
+                    >
+                      <Icon className="w-4 h-4" style={{ color }} strokeWidth={1.8} />
+                    </div>
+                    <span className="text-sm font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                      {label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div className="h-16" />
     </div>
   );
 }
