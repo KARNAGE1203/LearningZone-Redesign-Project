@@ -4,7 +4,6 @@ import {
   FileText, ClipboardList, BookOpen, Info, Menu, X, Bell,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { useNotifications } from '../context/NotificationContext';
 import type { CoursePageNav } from '../App';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -42,7 +41,6 @@ function Content({
   onClose,
 }: SidebarProps & { onClose?: () => void }) {
   const navItems = variant === 'student' ? STUDENT_NAV : COURSE_NAV;
-  const { unreadCount, openDrawer } = useNotifications();
 
   return (
     <div className="flex flex-col h-full select-none overflow-hidden">
@@ -61,45 +59,16 @@ function Content({
             <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.42)' }}>Student Portal</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          {/* Bell icon */}
+        {onClose && (
           <button
-            onClick={openDrawer}
-            className="relative w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-150"
+            onClick={onClose}
+            className="lg:hidden w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer"
             style={{ background: 'rgba(255,255,255,0.1)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.18)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
-            aria-label="Notifications"
+            aria-label="Close"
           >
-            <Bell className="w-3.5 h-3.5 text-white" strokeWidth={1.8} />
-            {unreadCount > 0 && (
-              <span
-                className="absolute -top-1 -right-1 flex items-center justify-center font-bold text-white leading-none"
-                style={{
-                  minWidth:     unreadCount > 9 ? 18 : 14,
-                  height:       14,
-                  fontSize:     9,
-                  background:   '#EF4444',
-                  borderRadius: 999,
-                  paddingLeft:  unreadCount > 9 ? 3 : 0,
-                  paddingRight: unreadCount > 9 ? 3 : 0,
-                }}
-              >
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
+            <X className="w-4 h-4 text-white" />
           </button>
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="lg:hidden w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
-              aria-label="Close"
-            >
-              <X className="w-4 h-4 text-white" />
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Back link */}

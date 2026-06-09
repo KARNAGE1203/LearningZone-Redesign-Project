@@ -5,6 +5,7 @@ import {
   ChevronRight, Megaphone,
 } from 'lucide-react';
 import { Sidebar } from '../components/Sidebar';
+import { useNotifications } from '../context/NotificationContext';
 import { cn } from '../lib/utils';
 import type { CoursePageNav } from '../App';
 
@@ -51,6 +52,7 @@ const GRADE_PCT = 0.90;
 export default function Home({ userId: _userId, onBack, onEnterCourse, onNavigate }: HomeProps) {
   const [search, setSearch] = useState('');
   const [ready,  setReady]  = useState(false);
+  const { unreadCount, openDrawer } = useNotifications();
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 250);
@@ -87,17 +89,34 @@ export default function Home({ userId: _userId, onBack, onEnterCourse, onNavigat
           </div>
 
           <div className="flex items-center gap-1 shrink-0 ml-auto md:ml-0">
-            <button className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Notifications">
+            <button
+              onClick={openDrawer}
+              className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
+              aria-label="Notifications"
+            >
               <Bell className="w-5 h-5" strokeWidth={1.8} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+              {unreadCount > 0 && (
+                <span
+                  className="absolute top-1.5 right-1.5 flex items-center justify-center text-white font-bold leading-none"
+                  style={{
+                    minWidth:     unreadCount > 9 ? 18 : 14,
+                    height:       14,
+                    fontSize:     9,
+                    background:   '#EF4444',
+                    borderRadius: 999,
+                    paddingLeft:  unreadCount > 9 ? 3 : 0,
+                    paddingRight: unreadCount > 9 ? 3 : 0,
+                  }}
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
-            <button className="hidden sm:flex w-10 h-10 rounded-xl items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Help">
+            <button
+              className="hidden sm:flex w-10 h-10 rounded-xl items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
+              aria-label="Help"
+            >
               <HelpCircle className="w-5 h-5" strokeWidth={1.8} />
-            </button>
-            <button className="w-10 h-10 rounded-full cursor-pointer ml-1 ring-2 ring-transparent hover:ring-teal-400 transition-all duration-200 overflow-hidden" aria-label="Profile">
-              <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #7c3aed, #0d8a7a)' }}>
-                <span className="text-white text-xs font-bold">DS</span>
-              </div>
             </button>
           </div>
         </header>
