@@ -3,7 +3,6 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import CourseMaterials from './pages/CourseMaterials';
-import CourseOverview from './pages/CourseOverview';
 import Grades from './pages/Grades';
 import Assessments from './pages/Assessments';
 import Resources from './pages/Resources';
@@ -17,7 +16,6 @@ export type Page =
   | 'dashboard'
   | 'grades'
   | 'notifications'
-  | 'overview'
   | 'materials'
   | 'assessments'
   | 'resources'
@@ -69,7 +67,6 @@ function App() {
         <Dashboard
           userId={userId!}
           onBack={() => setPage('home')}
-          onEnterCourse={() => setPage('overview')}
           onNavigate={handleNavigate}
         />
       );
@@ -97,7 +94,6 @@ function App() {
     const courseBack = () => setPage('dashboard');
     const courseHome = () => setPage('home');
 
-    if (page === 'overview')    return <CourseOverview onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
     if (page === 'materials')   return <CourseMaterials onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
     if (page === 'assessments') return <Assessments    onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
     if (page === 'resources')   return <Resources      onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;

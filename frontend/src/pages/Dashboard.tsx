@@ -12,10 +12,9 @@ import type { CoursePageNav } from '../App';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface DashboardProps {
-  userId:        string;
-  onBack:        () => void;
-  onEnterCourse: () => void;
-  onNavigate:    (page: CoursePageNav) => void;
+  userId:     string;
+  onBack:     () => void;
+  onNavigate: (page: CoursePageNav) => void;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -49,7 +48,7 @@ const GRADE_PCT = 0.90;
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function Dashboard({ userId: _userId, onBack, onEnterCourse, onNavigate }: DashboardProps) {
+export default function Dashboard({ userId: _userId, onBack, onNavigate }: DashboardProps) {
   const [search, setSearch] = useState('');
   const [ready,  setReady]  = useState(false);
   const { unreadCount, openDrawer } = useNotifications();
@@ -277,7 +276,7 @@ export default function Dashboard({ userId: _userId, onBack, onEnterCourse, onNa
                   {/* Actions */}
                   <div className="flex flex-wrap items-center gap-3">
                     <button
-                      onClick={onEnterCourse}
+                      onClick={() => onNavigate('materials')}
                       className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97]"
                       style={{ background: '#0d8a7a', boxShadow: '0 4px 12px rgba(13,138,122,0.28)' }}
                     >

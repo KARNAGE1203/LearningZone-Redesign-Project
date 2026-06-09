@@ -25,7 +25,6 @@ const STUDENT_NAV: { icon: React.ElementType; label: string; page: CoursePageNav
 ];
 
 const COURSE_NAV: { icon: React.ElementType; label: string; page: CoursePageNav }[] = [
-  { icon: LayoutDashboard, label: 'Overview',    page: 'overview'    },
   { icon: FileText,        label: 'Materials',   page: 'materials'   },
   { icon: ClipboardList,   label: 'Assessments', page: 'assessments' },
   { icon: Info,            label: 'Course Info', page: 'course-info' },
@@ -124,42 +123,100 @@ function Content({
         {variant === 'student' ? 'Overview' : 'Course Navigation'}
       </p>
 
-      {/* Nav items */}
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ icon: Icon, label, page }) => {
-          const active = page === activePage;
-          return (
-            <button
-              key={label}
-              onClick={() => { onNavigate(page); onClose?.(); }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] cursor-pointer transition-all duration-150 text-left"
-              style={
-                active
-                  ? {
-                      background: 'rgba(255,255,255,0.15)',
-                      color: 'white',
-                      fontWeight: 700,
-                      boxShadow: 'inset 3px 0 0 rgba(255,255,255,0.85)',
-                    }
-                  : { color: 'rgba(255,255,255,0.55)' }
-              }
-              onMouseEnter={(e) => {
-                if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
-              }}
-              onMouseLeave={(e) => {
-                if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.55)';
-              }}
+      {/* Scrollable nav area */}
+      <div className="flex-1 overflow-y-auto">
+
+        {/* Primary nav items */}
+        <nav className="px-3 space-y-0.5">
+          {navItems.map(({ icon: Icon, label, page }) => {
+            const active = page === activePage;
+            return (
+              <button
+                key={label}
+                onClick={() => { onNavigate(page); onClose?.(); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] cursor-pointer transition-all duration-150 text-left"
+                style={
+                  active
+                    ? {
+                        background: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        fontWeight: 700,
+                        boxShadow: 'inset 3px 0 0 rgba(255,255,255,0.85)',
+                      }
+                    : { color: 'rgba(255,255,255,0.55)' }
+                }
+                onMouseEnter={(e) => {
+                  if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.55)';
+                }}
+              >
+                <Icon
+                  className="w-4 h-4 shrink-0"
+                  style={{ color: active ? 'white' : 'rgba(255,255,255,0.5)' }}
+                  strokeWidth={active ? 2.2 : 1.8}
+                />
+                {label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* ── Course quick-links (student sidebar only) ──────────────────── */}
+        {variant === 'student' && (
+          <>
+            <div className="mx-4 mt-3 mb-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
+
+            {/* Course label + chip */}
+            <p
+              className="px-5 mb-2 text-[9px] font-extrabold tracking-[0.2em] uppercase"
+              style={{ color: 'rgba(255,255,255,0.32)' }}
             >
-              <Icon
-                className="w-4 h-4 shrink-0"
-                style={{ color: active ? 'white' : 'rgba(255,255,255,0.5)' }}
-                strokeWidth={active ? 2.2 : 1.8}
-              />
-              {label}
-            </button>
-          );
-        })}
-      </nav>
+              Current Course
+            </p>
+            <div className="px-4 mb-2 flex items-center gap-2">
+              <div
+                className="w-5 h-5 rounded-md flex items-center justify-center text-[8px] font-extrabold text-white shrink-0"
+                style={{ background: 'rgba(255,255,255,0.15)' }}
+              >
+                OS
+              </div>
+              <span className="text-[11px] font-semibold truncate" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                OS &amp; Networks
+              </span>
+            </div>
+
+            {/* Course nav shortcuts */}
+            <nav className="px-3 space-y-0.5 pb-2">
+              {COURSE_NAV.map(({ icon: Icon, label, page }) => (
+                <button
+                  key={label}
+                  onClick={() => { onNavigate(page); onClose?.(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[12px] cursor-pointer transition-all duration-150 text-left"
+                  style={{ color: 'rgba(255,255,255,0.45)' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color      = 'rgba(255,255,255,0.8)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.07)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color      = 'rgba(255,255,255,0.45)';
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <Icon
+                    className="w-3.5 h-3.5 shrink-0"
+                    style={{ color: 'rgba(255,255,255,0.38)' }}
+                    strokeWidth={1.8}
+                  />
+                  {label}
+                </button>
+              ))}
+            </nav>
+          </>
+        )}
+
+      </div>
 
       {/* Profile */}
       <div
