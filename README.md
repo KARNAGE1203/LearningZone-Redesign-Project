@@ -23,10 +23,15 @@ DMU Dubai's existing learning portal works, but it wasn't designed with the stud
 
 | Page | Description |
 |------|-------------|
-| **Login** | Student ID (`P` + 7 digits) + password auth. JWT stored in `localStorage`. |
-| **My Courses** | Post-login home — academic year block timeline, active course hero card, university announcements, communities, academic calendar. |
-| **Dashboard** | Course-level home — animated stats (GPA, credits, attendance), progress ring, deadlines, today's classes, announcements. |
-| **Course Materials** | Week-by-week content accordion — filterable by type (Slides / Labs / Videos), smooth animated open/close. |
+| **Login** | Student ID (`P` + 7 digits) and password auth. JWT stored in `localStorage`. |
+| **Home** | Post-login landing page with course summary, announcements, communities, calendar, and quick actions. |
+| **Dashboard** | Course dashboard with student stats, progress, deadlines, announcements, and notifications. |
+| **Grades** | Grade overview page with assessment performance, score ring, and feedback details. |
+| **Notifications** | Full notification inbox with filters for unread, read, and archived items. |
+| **Course Materials** | Week-by-week materials list with slides, labs, and videos plus a video player modal. |
+| **Assessments** | Assessment overview with active tasks, date sheet, and past assessment history. |
+| **Course Info** | Course details, weighting breakdown, timeline, and instructor contact information. |
+| **Resources** | Library links, external study resources, and student support contacts. |
 
 ---
 
@@ -165,9 +170,14 @@ learning-zone-redesign/
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── Login.tsx
-│   │   │   ├── MyCourses.tsx      # Post-login home
-│   │   │   ├── Home.tsx           # Course dashboard
-│   │   │   └── CourseMaterials.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Grades.tsx
+│   │   │   ├── Notifications.tsx
+│   │   │   ├── CourseMaterials.tsx
+│   │   │   ├── Assessments.tsx
+│   │   │   ├── CourseInfo.tsx
+│   │   │   └── Resources.tsx
 │   │   ├── lib/
 │   │   │   ├── api.ts             # Typed fetch wrapper
 │   │   │   └── utils.ts

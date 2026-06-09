@@ -15,6 +15,7 @@ interface CourseMaterialsProps {
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
+// Types used to describe materials and filters on the page.
 
 type ItemType   = 'slides' | 'lab' | 'video';
 type ItemStatus = 'viewed' | 'not-started';
@@ -118,6 +119,7 @@ const FILTERS: FilterKey[] = ['All', 'Slides', 'Labs', 'Videos'];
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function CourseMaterials({ onBack, onHome, onNavigate }: CourseMaterialsProps) {
+  // Active filter for the materials list.
   const [activeFilter,   setActiveFilter]   = useState<FilterKey>('All');
   const [expandedWeeks,  setExpandedWeeks]  = useState<Set<number>>(new Set([34]));
   const [materialSearch, setMaterialSearch] = useState('');
@@ -160,6 +162,7 @@ export default function CourseMaterials({ onBack, onHome, onNavigate }: CourseMa
   }
 
   function filteredItems(items: WeekItem[]): WeekItem[] {
+    // Filter by selected material type and search term.
     const typeFilter = FILTER_TYPE[activeFilter];
     let result = typeFilter ? items.filter((i) => i.type === typeFilter) : items;
     const q = materialSearch.trim().toLowerCase();
@@ -182,6 +185,7 @@ export default function CourseMaterials({ onBack, onHome, onNavigate }: CourseMa
       relatedSlides: item.relatedSlides,
       relatedLab:    item.relatedLab,
     };
+    // Remember the selected video and open the modal.
     const idx = allVideos.findIndex(v => v.id === video.id);
     setCurrentVideoIndex(idx >= 0 ? idx : 0);
     setSelectedVideo(video);
@@ -217,6 +221,7 @@ export default function CourseMaterials({ onBack, onHome, onNavigate }: CourseMa
 
           {/* Course header strip */}
           <div className="px-6 lg:px-8 py-8" style={{ background: 'linear-gradient(130deg, #1E1B4B 0%, #3730A3 100%)' }}>
+        {/* Course header strip shows the active course and module. */}
             <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
               MATERIALS · CTEC1704D_2025_604
             </p>

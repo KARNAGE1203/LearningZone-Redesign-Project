@@ -60,6 +60,7 @@ export function VideoPlayerModal({
   currentIndex = 0,
   totalCount   = 1,
 }: VideoPlayerModalProps) {
+  // Control the open/close animation state.
   const [mounted, setMounted] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const playerRef = useRef<any>(null);
@@ -74,11 +75,15 @@ export function VideoPlayerModal({
     }
   }, [isOpen]);
 
+  // Lock page scrolling while the modal is open.
+
   // ── Scroll lock ─────────────────────────────────────────────────────────────
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'unset';
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
+
+  // Close the modal with keyboard shortcuts when open.
 
   // ── Keyboard ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -95,6 +100,7 @@ export function VideoPlayerModal({
   if (!isOpen || !video) return null;
 
   const cleanTitle = video.title.replace(/^"|"$/g, '');
+  // Remove surrounding quotes from the video title for accessibility labels.
 
   const seekToResume = () => {
     if (video.resumeFrom !== undefined) {

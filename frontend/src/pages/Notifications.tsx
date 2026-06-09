@@ -14,6 +14,7 @@ interface NotificationsProps {
 }
 
 // ─── Filter helpers ───────────────────────────────────────────────────────────
+// Notification list filters used to show specific statuses and types.
 
 type StatusFilter = 'all' | 'unread' | 'read' | 'archived';
 
@@ -42,6 +43,7 @@ function NotifCard({
   onRestore,
   onDelete,
 }: {
+  // A single notification card with actions for mark read, archive, restore, delete.
   notif:       Notification;
   onMarkRead:  () => void;
   onArchive:   () => void;
@@ -175,6 +177,7 @@ function SectionLabel({ text, right }: { text: string; right?: React.ReactNode }
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Notifications({ onBack, onNavigate }: NotificationsProps) {
+  // Notification state is provided by the context.
   const { notifications, markAsRead, markAllAsRead, archive, restore, deleteNotif } =
     useNotifications();
 
@@ -184,6 +187,7 @@ export default function Notifications({ onBack, onNavigate }: NotificationsProps
 
   // Apply filters
   const filtered = notifications.filter(n => {
+    // Apply type and status filters to the main notification list.
     if (typeFilter !== 'all' && n.type !== typeFilter) return false;
     if (statusFilter === 'all') return true;
     return n.status === statusFilter;
@@ -249,6 +253,7 @@ export default function Notifications({ onBack, onNavigate }: NotificationsProps
           </div>
 
           {/* ── FILTER BAR ── */}
+          {/* Controls for filtering notifications by status and type. */}
           <div className="px-6 lg:px-8 py-4">
             <div
               className="bg-white rounded-xl border px-4 py-3 flex items-center justify-between gap-4 flex-wrap"

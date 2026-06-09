@@ -13,6 +13,7 @@ interface NotificationDrawerProps {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+// Helper used to compare two dates without time.
 
 function isSameDay(a: Date, b: Date) {
   return (
@@ -23,6 +24,7 @@ function isSameDay(a: Date, b: Date) {
 }
 
 function groupNotifications(notifs: Notification[]) {
+  // Group notifications into TODAY / YESTERDAY / THIS WEEK buckets.
   const today     = new Date();
   const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
 
@@ -43,6 +45,7 @@ function groupNotifications(notifs: Notification[]) {
 }
 
 // ─── Notification Item (compact drawer style) ─────────────────────────────────
+// Each notification row in the drawer shows title, preview, status, and actions.
 
 function DrawerItem({
   notif,
@@ -62,6 +65,7 @@ function DrawerItem({
     <div
       className="py-3 border-b"
       style={{ borderColor: '#F0EFEA' }}
+      // Clicking the row marks unread items as read.
       onClick={isUnread ? onMarkRead : undefined}
     >
       <div className="flex items-start gap-2.5">
@@ -170,6 +174,7 @@ export function NotificationDrawer({ onNavigate }: NotificationDrawerProps) {
   const groups = useMemo(() => groupNotifications(filtered), [filtered]);
 
   const handleView = (notif: Notification) => {
+    // Mark viewed notifications as read, close the drawer, and navigate.
     markAsRead(notif.id);
     closeDrawer();
     const segment = (notif.actionUrl ?? '/notifications').split('/').filter(Boolean).pop() ?? 'notifications';

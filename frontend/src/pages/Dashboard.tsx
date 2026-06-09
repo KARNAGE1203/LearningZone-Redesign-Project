@@ -18,6 +18,7 @@ interface DashboardProps {
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
+// Dashboard cards and announcement data used for the student dashboard layout.
 
 const STATS = [
   { label: 'Materials Available', value: '24',    sub: 'This week',         icon: FileText,      ring: '#0d8a7a', bg: '#f0fdf4', fg: '#059669' },
@@ -49,6 +50,7 @@ const GRADE_PCT = 0.90;
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function Dashboard({ userId: _userId, onBack, onNavigate }: DashboardProps) {
+  // Search query for the dashboard's top search input.
   const [search, setSearch] = useState('');
   const [ready,  setReady]  = useState(false);
   const { unreadCount, openDrawer } = useNotifications();
@@ -58,12 +60,15 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
     return () => clearTimeout(t);
   }, []);
 
+  // `ready` controls the entrance animation on the hero section.
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
       <Sidebar variant="student" activePage="dashboard" onNavigate={onNavigate} onBack={onBack} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+        {/* Main panel contains the top navbar and scrollable dashboard content. */}
 
         {/* Top Navbar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center gap-3 px-4 md:px-6 lg:px-8 shrink-0 z-20">
@@ -124,6 +129,7 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
         <main className="flex-1 overflow-y-auto">
 
           {/* Hero banner — OS & Networks course themed */}
+          {/* This section gives the course summary and progress highlight. */}
           <div
             className="relative overflow-hidden px-5 pt-10 pb-16 sm:px-8 sm:pt-12 sm:pb-20 md:px-10 lg:pt-14 lg:pb-20"
             style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #27247a 40%, #3730a3 100%)' }}

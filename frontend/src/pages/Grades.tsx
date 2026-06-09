@@ -14,7 +14,7 @@ interface GradesProps {
   onBack:     () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
-
+// ─── Data ─────────────────────────────────────────────────────────────────────
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const GRADE_RING_R = 46;
@@ -65,12 +65,14 @@ const SCORE_BARS = [
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Grades({ onBack, onNavigate }: GradesProps) {
+  // `ready` animates the grade ring on mount.
   const [ready,            setReady]            = useState(false);
   const [search,           setSearch]           = useState('');
   const [expandedFeedback, setExpandedFeedback] = useState<number[]>([]);
   const { unreadCount, openDrawer } = useNotifications();
 
   function toggleFeedback(i: number) {
+    // Expand or collapse the selected feedback card.
     setExpandedFeedback(prev =>
       prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i],
     );
@@ -81,6 +83,8 @@ export default function Grades({ onBack, onNavigate }: GradesProps) {
     return () => clearTimeout(t);
   }, []);
 
+  // The dashboard uses a small animation delay after mounting.
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
@@ -89,6 +93,7 @@ export default function Grades({ onBack, onNavigate }: GradesProps) {
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
 
         {/* ── Top Navbar (matches Dashboard) ── */}
+        {/* This top nav mirrors the dashboard and holds search + notifications. */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center gap-3 px-4 md:px-6 lg:px-8 shrink-0 z-20">
 
           <div className="hidden md:flex items-center gap-2 text-sm shrink-0 min-w-0">

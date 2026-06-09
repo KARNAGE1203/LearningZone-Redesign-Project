@@ -16,6 +16,7 @@ interface ResourcesProps {
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
+// Resource cards and support links for the course resources page.
 
 const ELIBRARY = [
   {
@@ -86,6 +87,7 @@ const SUPPORT = [
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps) {
+  // Render the resources page with course nav and external resource cards.
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
@@ -95,6 +97,7 @@ export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps
         <main className="flex-1 overflow-y-auto">
 
           {/* Course header strip */}
+          {/* Header identifies current course context for the resources page. */}
           <div className="px-6 lg:px-8 py-8" style={{ background: 'linear-gradient(130deg, #1E1B4B 0%, #3730A3 100%)' }}>
             <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
               RESOURCES · CTEC1704D_2025_604
@@ -118,6 +121,7 @@ export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps
           <div className="px-6 lg:px-8 py-6 space-y-8 pb-12">
 
             {/* ── SECTION 1: E-Library ── */}
+            {/* Official library services available to students. */}
             <div>
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-7 h-7 rounded-lg bg-teal-50 flex items-center justify-center">
@@ -151,6 +155,7 @@ export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps
             </div>
 
             {/* ── SECTION 2: External Resources ── */}
+            {/* Curated external links for deeper study. */}
             <div>
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">

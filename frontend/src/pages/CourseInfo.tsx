@@ -14,7 +14,7 @@ interface CourseInfoProps {
   onHome?:    () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
-
+// ─── Data ─────────────────────────────────────────────────────────────────────
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const COURSE_DETAILS = [
@@ -43,11 +43,14 @@ const BLOCK_STEPS = [
 
 export default function CourseInfo({ onBack, onHome, onNavigate }: CourseInfoProps) {
   const [ready, setReady] = useState(false);
+  // Animation state used to fill the progress bar and timeline visuals.
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 200);
     return () => clearTimeout(t);
   }, []);
+
+  // Delay the animation to make the page feel smoother on load.
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -58,6 +61,7 @@ export default function CourseInfo({ onBack, onHome, onNavigate }: CourseInfoPro
         <main className="flex-1 overflow-y-auto">
 
           {/* Course header strip */}
+          {/* High-level course info and current module label. */}
           <div className="px-6 lg:px-8 py-8" style={{ background: 'linear-gradient(130deg, #1E1B4B 0%, #3730A3 100%)' }}>
             <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
               COURSE INFO · CTEC1704D_2025_604

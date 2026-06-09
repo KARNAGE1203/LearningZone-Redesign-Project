@@ -13,7 +13,7 @@ interface AssessmentsProps {
   onHome?:    () => void;
   onNavigate: (page: CoursePageNav) => void;
 }
-
+// ─── Data ─────────────────────────────────────────────────────────────────────
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const DATE_SHEET_ROWS = [
@@ -30,6 +30,7 @@ const PAST_ASSESSMENTS = [
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsProps) {
+  // Control whether past assessments are shown.
   const [pastExpanded, setPastExpanded] = useState(false);
 
   return (
@@ -41,6 +42,7 @@ export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsP
         <main className="flex-1 overflow-y-auto">
 
           {/* Course header strip */}
+          {/* Header bar identifies the current course and module. */}
           <div className="px-6 lg:px-8 py-8" style={{ background: 'linear-gradient(130deg, #1E1B4B 0%, #3730A3 100%)' }}>
             <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
               ASSESSMENTS · CTEC1704D_2025_604
@@ -54,6 +56,7 @@ export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsP
           </div>
 
           {/* Breadcrumb */}
+          {/* Breadcrumb helps users see the current path inside the course pages. */}
           <div className="px-6 lg:px-8 py-3 flex items-center gap-2 text-sm border-b border-slate-100 bg-white">
             <span className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">My Courses</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
@@ -163,6 +166,7 @@ export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsP
             </div>
 
             {/* ── SECTION 2: Past Assessments (collapsible) ── */}
+            {/* Past assessment history can be toggled open or closed. */}
             <div>
               <button
                 onClick={() => setPastExpanded((p) => !p)}

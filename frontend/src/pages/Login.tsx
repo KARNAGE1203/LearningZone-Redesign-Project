@@ -7,9 +7,11 @@ interface LoginProps {
   onSuccess: (userId: string) => void;
 }
 
+// Valid student ID format: P followed by 7 digits.
 const STUDENT_ID_REGEX = /^P\d{7}$/;
 
 export default function Login({ onSuccess }: LoginProps) {
+  // Local state for the login form inputs and validation.
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +28,7 @@ export default function Login({ onSuccess }: LoginProps) {
   function handleStudentIdChange(val: string) {
     const upper = val.toUpperCase();
     setStudentId(upper);
+    // Validate student ID as the user types.
     if (upper && !upper.startsWith('P')) {
       setIdError('Student ID must start with P');
     } else if (upper.length === 8 && !STUDENT_ID_REGEX.test(upper)) {
@@ -44,6 +47,7 @@ export default function Login({ onSuccess }: LoginProps) {
     setError('');
     setLoading(true);
     try {
+      // Call backend login and save the returned token/user data.
       const res = await api.login(studentId, password);
       localStorage.setItem('lz_token', res.token);
       localStorage.setItem('lz_user', JSON.stringify(res.user));

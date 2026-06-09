@@ -13,6 +13,7 @@ interface HomeProps {
 }
 
 // ─── Static data ────────────────────────────────────────────────────────────
+// Static page content used to render the dashboard-like landing homepage.
 
 const NAV_LINKS = ['My Courses', 'Calendar', 'Library', 'Support'] as const;
 
@@ -24,6 +25,7 @@ const TIMELINE = [
 ];
 
 const ANNOUNCEMENTS = [
+  // Announcement cards shown in the home page feed.
   {
     tag: 'DMU WIDE', tagColor: '#7c3aed', tagBg: '#f5f3ff',
     title: 'DMU Support Fund — Applications Close June 12',
@@ -71,6 +73,7 @@ const ACTIVE_RING_C = 2 * Math.PI * ACTIVE_RING_R;
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Home({ onEnterCourse, onContinueLearning }: HomeProps) {
+  // Delay used to animate in the hero section once the page mounts.
   const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
   const { unreadCount, openDrawer } = useNotifications();
@@ -79,6 +82,8 @@ export default function Home({ onEnterCourse, onContinueLearning }: HomeProps) {
     const t = setTimeout(() => setReady(true), 200);
     return () => clearTimeout(t);
   }, []);
+
+  // The page layout is divided into header, hero, and summary sections.
 
   return (
     <div
@@ -91,6 +96,7 @@ export default function Home({ onEnterCourse, onContinueLearning }: HomeProps) {
       ══════════════════════════════════════════════════════════ */}
       <header
         className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80"
+        // Sticky top nav maintains access to search and notifications.
         style={{ boxShadow: '0 1px 6px rgba(0,0,0,0.05)' }}
       >
         <div className="max-w-screen-2xl mx-auto px-6 lg:px-10 h-16 flex items-center gap-5">

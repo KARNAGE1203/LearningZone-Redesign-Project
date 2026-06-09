@@ -4,6 +4,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { NOTIF_TYPES, type Notification } from '../types/notification';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+// Map notification action URLs to the app page names used by navigation.
 
 function actionUrlToPage(url: string): string {
   const segment = url.split('/').filter(Boolean).pop() ?? '';
@@ -31,6 +32,7 @@ function ToastItem({ notif, onDismiss, onView }: ToastItemProps) {
   const [entered,  setEntered]  = useState(false);
   const [exiting,  setExiting]  = useState(false);
   const type = NOTIF_TYPES[notif.type];
+  // Track entry and exit state for toast animation.
 
   const startExit = useCallback(() => {
     setExiting(true);
@@ -43,7 +45,7 @@ function ToastItem({ notif, onDismiss, onView }: ToastItemProps) {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Auto-dismiss for system / university
+  // Auto-dismiss system and university notifications after 8 seconds.
   useEffect(() => {
     if (notif.type === 'system' || notif.type === 'university') {
       const t = setTimeout(startExit, 8000);
@@ -52,6 +54,7 @@ function ToastItem({ notif, onDismiss, onView }: ToastItemProps) {
   }, [notif.type, startExit]);
 
   const style: React.CSSProperties = {
+    // Color and motion are controlled here based on enter/exit state.
     transform: exiting
       ? 'translateX(120%)'
       : entered
@@ -135,7 +138,7 @@ interface NotificationToastProps {
 
 export function NotificationToast({ onNavigate }: NotificationToastProps) {
   const { toasts, dismissToast, markAsRead } = useNotifications();
-  // max 3 — newest at bottom (end of array)
+  // Show only the 3 newest toast notifications.
   const visible = toasts.slice(-3);
 
   return (

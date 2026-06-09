@@ -17,6 +17,7 @@ export interface SidebarProps {
 }
 
 // ─── Nav config ───────────────────────────────────────────────────────────────
+// Sidebar navigation items for student and course views.
 
 const STUDENT_NAV: { icon: React.ElementType; label: string; page: CoursePageNav }[] = [
   { icon: LayoutDashboard, label: 'Dashboard',    page: 'dashboard'    },
@@ -43,6 +44,7 @@ function Content({
 }: SidebarProps & { onClose?: () => void }) {
   const navItems = variant === 'student' ? STUDENT_NAV : COURSE_NAV;
 
+  // Shared sidebar content for both desktop and mobile drawer.
   return (
     <div className="flex flex-col h-full select-none overflow-hidden">
 
@@ -245,6 +247,7 @@ function Content({
 export function Sidebar({ variant, activePage, onNavigate, onBack, onHome }: SidebarProps) {
   const [open, setOpen] = useState(false);
 
+  // Close the mobile drawer when we switch to desktop widths.
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
     const h  = (e: MediaQueryListEvent) => { if (e.matches) setOpen(false); };

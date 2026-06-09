@@ -11,6 +11,8 @@ import Notifications from './pages/Notifications';
 import { NotificationDrawer } from './components/NotificationDrawer';
 import { NotificationToast } from './components/NotificationToast';
 
+// App.tsx manages the top-level page state and the authentication gate.
+// It chooses which page component to render based on the current page.
 export type Page =
   | 'home'
   | 'dashboard'
@@ -41,17 +43,19 @@ function App() {
     setPage('home');
   }
 
+  // Simple page switcher used by sidebars and buttons.
   function handleNavigate(p: CoursePageNav) {
     setPage(p);
   }
 
+  // If no user is logged in, render the login page only.
   if (!userId) {
     return <Login onSuccess={(id: string) => { setUserId(id); setPage('home'); }} />;
   }
 
   // ── Render current page ───────────────────────────────────────────────────
   function renderPage() {
-    // Level 1: Home (top nav only)
+    // Level 1: Home page shown after login, before entering the course.
     if (page === 'home') {
       return (
         <Home
@@ -61,7 +65,7 @@ function App() {
       );
     }
 
-    // Level 2: Student pages (student sidebar)
+    // Level 2: Student home pages that use the student sidebar.
     if (page === 'dashboard') {
       return (
         <Dashboard
@@ -89,6 +93,8 @@ function App() {
         />
       );
     }
+
+    // Level 3: Course-specific pages that use the course sidebar.
 
     // Level 3: Course pages (course sidebar)
     const courseBack = () => setPage('dashboard');
