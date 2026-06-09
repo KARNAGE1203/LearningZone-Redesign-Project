@@ -14,8 +14,7 @@ interface AssessmentsProps {
   onNavigate: (page: CoursePageNav) => void;
 }
 // ─── Data ─────────────────────────────────────────────────────────────────────
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
+// Static data for active and past assessments shown on the assessments page.
 const DATE_SHEET_ROWS = [
   { assessment: 'Phase Test 1', status: 'Completed', statusBg: '#f0fdf4', statusFg: '#059669', date: 'Oct 3, 2025'        },
   { assessment: 'Phase Test 2', status: 'Upcoming',  statusBg: '#fffbeb', statusFg: '#d97706', date: 'May 29, 2026 · 14:00' },
@@ -28,7 +27,7 @@ const PAST_ASSESSMENTS = [
 ];
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-
+// The main assessments page showing active and past assessments with details and actions.
 export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsProps) {
   // Control whether past assessments are shown.
   const [pastExpanded, setPastExpanded] = useState(false);
