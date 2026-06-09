@@ -48,7 +48,7 @@ function Content({
       {/* Logo — click navigates to Dashboard (home) */}
       <div className="px-5 pt-6 pb-4 flex items-center justify-between shrink-0">
         <button
-          onClick={() => { onNavigate('dashboard'); onClose?.(); }}
+          onClick={() => { onBack(); onClose?.(); }}
           className="flex items-center gap-2.5 cursor-pointer rounded-xl px-1 py-1 -ml-1 transition-opacity duration-150 hover:opacity-75 active:opacity-60 text-left"
           aria-label="Go to Dashboard"
         >

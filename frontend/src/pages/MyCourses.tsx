@@ -17,10 +17,10 @@ interface MyCoursesProps {
 const NAV_LINKS = ['My Courses', 'Calendar', 'Library', 'Support'] as const;
 
 const TIMELINE = [
-  { block: 1, course: 'Database Design',        grade: '68%', status: 'done'   as const },
-  { block: 2, course: 'Fundamental CS',          grade: '74%', status: 'done'   as const },
-  { block: 3, course: 'Computer Programming',    grade: '81%', status: 'done'   as const },
-  { block: 4, course: 'OS & Networks',           grade: '67%', status: 'active' as const },
+  { block: 1, course: 'Database Design',      grade: '68%', status: 'done'   as const, abbr: 'DB', color: '#0369a1', accentBg: '#e0f2fe' },
+  { block: 2, course: 'Fundamental CS',        grade: '74%', status: 'done'   as const, abbr: 'CS', color: '#7c3aed', accentBg: '#ede9fe' },
+  { block: 3, course: 'Computer Programming',  grade: '81%', status: 'done'   as const, abbr: 'CP', color: '#059669', accentBg: '#d1fae5' },
+  { block: 4, course: 'OS & Networks',         grade: '67%', status: 'active' as const, abbr: 'OS', color: '#0d8a7a', accentBg: '#ccfbf1' },
 ];
 
 const ANNOUNCEMENTS = [
@@ -95,8 +95,12 @@ export default function MyCourses({ onEnterCourse, onContinueLearning }: MyCours
       >
         <div className="max-w-screen-2xl mx-auto px-6 lg:px-10 h-16 flex items-center gap-5">
 
-          {/* Logo */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          {/* Logo — click scrolls to top (home) */}
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2.5 shrink-0 cursor-pointer transition-opacity hover:opacity-75 active:opacity-50"
+            aria-label="Go to home"
+          >
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ background: '#0d8a7a' }}
@@ -104,7 +108,7 @@ export default function MyCourses({ onEnterCourse, onContinueLearning }: MyCours
               <GraduationCap className="w-4 h-4 text-white" strokeWidth={2.2} />
             </div>
             <span className="font-bold text-slate-900 text-[15px] tracking-tight">LearningZone</span>
-          </div>
+          </button>
 
           <div className="w-px h-5 bg-slate-200 shrink-0" />
 
@@ -429,7 +433,7 @@ export default function MyCourses({ onEnterCourse, onContinueLearning }: MyCours
           </div>
         </div>
 
-        {/* ── SECTION 3: TIMELINE ────────────────────────────── */}
+        {/* ── SECTION 3: COURSE CARDS (Academic Year timeline) ── */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <span className="text-[11px] font-bold tracking-[0.18em] uppercase text-slate-500">
@@ -437,104 +441,164 @@ export default function MyCourses({ onEnterCourse, onContinueLearning }: MyCours
             </span>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8 overflow-x-auto">
-            <div className="relative min-w-[580px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {TIMELINE.map(({ block, course, grade, status, abbr, color, accentBg }) => {
+              const done   = status === 'done';
+              const active = status === 'active';
+              const ringR  = 15;
+              const ringC  = 2 * Math.PI * ringR;
 
-              {/* Track line */}
-              <div className="absolute top-[38px] left-[12.5%] right-[12.5%] h-[3px] rounded-full bg-slate-200">
+              /* ── Active card (dark / teal) ─────────────────── */
+              if (active) return (
                 <div
-                  className="absolute top-0 left-0 h-full rounded-full"
+                  key={block}
+                  className="rounded-2xl overflow-hidden flex flex-col"
                   style={{
-                    width: ready ? '75%' : '0%',
-                    background: 'linear-gradient(90deg, #0d8a7a 0%, #34d399 100%)',
-                    transition: 'width 1.5s cubic-bezier(0.16,1,0.3,1) 0.25s',
+                    background:   'linear-gradient(145deg, #0d1b2a 0%, #0d3b38 100%)',
+                    border:       '1.5px solid rgba(13,138,122,0.5)',
+                    boxShadow:    '0 8px 32px rgba(13,138,122,0.22)',
                   }}
-                />
-              </div>
+                >
+                  {/* Teal glow top bar */}
+                  <div className="h-1" style={{ background: 'linear-gradient(90deg, #0d8a7a, #34d399)' }} />
 
-              {/* Nodes + labels */}
-              <div className="grid grid-cols-4">
-                {TIMELINE.map(({ block, course, grade, status }) => {
-                  const done = status === 'done';
-                  const active = status === 'active';
-
-                  return (
-                    <div key={block} className="flex flex-col items-center text-center px-2">
-
-                      {/* Node */}
-                      <div className="relative mb-5 mt-1">
-                        {active && (
-                          <span
-                            className="absolute inset-0 rounded-full animate-ping"
-                            style={{
-                              background: 'rgba(13,138,122,0.35)',
-                              transform: 'scale(1.55)',
-                              animationDuration: '2s',
-                            }}
-                          />
-                        )}
-                        <div
-                          className="relative z-10 w-[58px] h-[58px] rounded-full flex items-center justify-center border-2"
-                          style={
-                            done
-                              ? { background: '#0d8a7a', borderColor: '#0d8a7a' }
-                              : {
-                                  background: 'linear-gradient(135deg, #0d8a7a, #0a7a6c)',
-                                  borderColor: '#0d8a7a',
-                                  boxShadow: '0 0 0 5px rgba(13,138,122,0.2), 0 4px 16px rgba(13,138,122,0.4)',
-                                }
-                          }
-                        >
-                          {done ? (
-                            <CheckCircle2 className="w-6 h-6 text-white" strokeWidth={2.5} />
-                          ) : (
-                            <span className="text-xs font-extrabold text-white">67%</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Block label */}
+                  <div className="p-5 flex flex-col flex-1">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
                       <span
-                        className="text-[10px] font-extrabold tracking-[0.14em] uppercase mb-1.5"
-                        style={{ color: active ? '#0d8a7a' : '#94a3b8' }}
+                        className="text-[10px] font-extrabold tracking-[0.18em] uppercase"
+                        style={{ color: '#5eead4' }}
                       >
                         Block {block}
                       </span>
-
-                      {/* Course name */}
-                      <p
-                        className="text-sm font-semibold leading-snug mb-2"
-                        style={{ color: active ? '#0f172a' : '#64748b' }}
+                      <div
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold"
+                        style={{
+                          background: 'rgba(13,138,122,0.2)',
+                          color:      '#5eead4',
+                          border:     '1px solid rgba(94,234,212,0.18)',
+                        }}
                       >
-                        {course}
-                      </p>
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse shrink-0" />
+                        Active
+                      </div>
+                    </div>
 
-                      {/* Grade / status badge */}
-                      {done && (
-                        <span className="text-sm font-extrabold mb-3" style={{ color: '#0d8a7a' }}>
-                          {grade}
-                        </span>
-                      )}
-                      {active && (
-                        <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full mb-3 border border-teal-200">
-                          <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
-                          Active
-                        </div>
-                      )}
+                    {/* Course avatar + name */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] font-extrabold text-white shrink-0"
+                        style={{ background: 'rgba(13,138,122,0.35)', border: '1px solid rgba(94,234,212,0.2)' }}
+                      >
+                        {abbr}
+                      </div>
+                      <h4 className="text-sm font-bold text-white leading-snug">{course}</h4>
+                    </div>
 
-                      {/* CTA */}
+                    {/* Grade + mini progress ring */}
+                    <div className="flex items-end justify-between mb-5">
+                      <div>
+                        <p className="text-2xl font-extrabold text-white leading-none">{grade}</p>
+                        <p className="text-[11px] mt-0.5 font-medium" style={{ color: 'rgba(94,234,212,0.6)' }}>
+                          In Progress
+                        </p>
+                      </div>
+                      <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: 'rotate(-90deg)' }}>
+                        <circle cx="19" cy="19" r={ringR} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
+                        <circle
+                          cx="19" cy="19" r={ringR}
+                          fill="none" stroke="#0d8a7a" strokeWidth="3.5" strokeLinecap="round"
+                          strokeDasharray={ringC}
+                          strokeDashoffset={ready ? ringC * 0.33 : ringC}
+                          style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16,1,0.3,1) 0.3s', filter: 'drop-shadow(0 0 4px rgba(13,138,122,0.7))' }}
+                        />
+                      </svg>
+                    </div>
+
+                    {/* CTAs */}
+                    <div className="flex gap-2 mt-auto">
                       <button
-                        onClick={active ? onEnterCourse : undefined}
-                        className="text-xs font-semibold transition-all duration-150 cursor-pointer hover:underline underline-offset-2"
-                        style={{ color: active ? '#0d8a7a' : '#94a3b8' }}
+                        onClick={onEnterCourse}
+                        className="flex-1 py-2 text-xs font-bold text-white rounded-xl transition-all duration-150 hover:brightness-110 active:scale-[0.97] cursor-pointer"
+                        style={{ background: '#0d8a7a', boxShadow: '0 4px 14px rgba(13,138,122,0.38)' }}
                       >
-                        {active ? 'Continue →' : 'View →'}
+                        Go to Course →
                       </button>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
+                </div>
+              );
+
+              /* ── Completed card (white) ─────────────────────── */
+              return (
+                <div
+                  key={block}
+                  onClick={onEnterCourse}
+                  className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer group"
+                >
+                  {/* Coloured top bar */}
+                  <div className="h-1 transition-opacity group-hover:opacity-90" style={{ background: color }} />
+
+                  <div className="p-5 flex flex-col flex-1">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span
+                        className="text-[10px] font-extrabold tracking-[0.18em] uppercase"
+                        style={{ color }}
+                      >
+                        Block {block}
+                      </span>
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: accentBg }}
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" style={{ color }} strokeWidth={2.5} />
+                      </div>
+                    </div>
+
+                    {/* Course avatar + name */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] font-extrabold shrink-0"
+                        style={{ background: accentBg, color }}
+                      >
+                        {abbr}
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800 leading-snug">{course}</h4>
+                    </div>
+
+                    {/* Grade + completed badge */}
+                    <div className="flex items-end justify-between mb-5">
+                      <div>
+                        <p className="text-2xl font-extrabold leading-none" style={{ color }}>
+                          {grade}
+                        </p>
+                        <p className="text-[11px] mt-0.5 text-slate-400 font-medium">Final Grade</p>
+                      </div>
+                      <span
+                        className="text-[9px] font-extrabold tracking-[0.1em] uppercase px-2.5 py-1 rounded-full"
+                        style={{ background: accentBg, color }}
+                      >
+                        Completed
+                      </span>
+                    </div>
+
+                    {/* CTA */}
+                    <button
+                      className="mt-auto w-full py-2 text-xs font-semibold rounded-xl transition-colors duration-150 cursor-pointer"
+                      style={{
+                        background: accentBg,
+                        color,
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(0.93)')}
+                      onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
+                    >
+                      View Course →
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
