@@ -4,6 +4,10 @@ import { FileText, FlaskConical } from 'lucide-react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
+interface PlayerRef {
+  seekTo(amount: number, type?: 'seconds' | 'fraction'): void;
+}
+
 export interface VideoMaterial {
   id:          string;
   type:        'video';
@@ -56,7 +60,7 @@ export function VideoPlayerModal({
   totalCount   = 1,
 }: VideoPlayerModalProps) {
   const [mounted, setMounted] = useState(false);
-  const playerRef = useRef<InstanceType<typeof ReactPlayer>>(null);
+  const playerRef = useRef<PlayerRef>(null);
 
   // ── Enter / exit animation ──────────────────────────────────────────────────
   useEffect(() => {
@@ -272,14 +276,6 @@ export function VideoPlayerModal({
             controls
             playing={false}
             light={false}
-            config={{
-              youtube: {
-                playerVars: {
-                  modestbranding: 1,
-                  rel:            0,
-                },
-              },
-            }}
           />
         </div>
 
