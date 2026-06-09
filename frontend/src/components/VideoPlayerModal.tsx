@@ -1,12 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import ReactPlayer from 'react-player';
+import ReactPlayer, { type PlayerRef } from 'react-player';
 import { FileText, FlaskConical } from 'lucide-react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
-
-interface PlayerRef {
-  seekTo(amount: number, type?: 'seconds' | 'fraction'): void;
-}
 
 export interface VideoMaterial {
   id:          string;
@@ -60,7 +56,7 @@ export function VideoPlayerModal({
   totalCount   = 1,
 }: VideoPlayerModalProps) {
   const [mounted, setMounted] = useState(false);
-  const playerRef = useRef<PlayerRef>(null);
+  const playerRef = useRef<PlayerRef | null>(null);
 
   // ── Enter / exit animation ──────────────────────────────────────────────────
   useEffect(() => {
