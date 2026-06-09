@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import ReactPlayer, { type PlayerRef } from 'react-player';
+import ReactPlayer from 'react-player';
 import { FileText, FlaskConical } from 'lucide-react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -56,7 +56,8 @@ export function VideoPlayerModal({
   totalCount   = 1,
 }: VideoPlayerModalProps) {
   const [mounted, setMounted] = useState(false);
-  const playerRef = useRef<PlayerRef | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const playerRef = useRef<any>(null);
 
   // ── Enter / exit animation ──────────────────────────────────────────────────
   useEffect(() => {
