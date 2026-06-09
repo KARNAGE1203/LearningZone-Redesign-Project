@@ -45,9 +45,13 @@ function Content({
   return (
     <div className="flex flex-col h-full select-none overflow-hidden">
 
-      {/* Logo */}
+      {/* Logo — click navigates to Dashboard (home) */}
       <div className="px-5 pt-6 pb-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2.5">
+        <button
+          onClick={() => { onNavigate('dashboard'); onClose?.(); }}
+          className="flex items-center gap-2.5 cursor-pointer rounded-xl px-1 py-1 -ml-1 transition-opacity duration-150 hover:opacity-75 active:opacity-60 text-left"
+          aria-label="Go to Dashboard"
+        >
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: 'rgba(255,255,255,0.15)' }}
@@ -58,7 +62,7 @@ function Content({
             <p className="text-white font-bold text-[13px] leading-none tracking-tight">LearningZone</p>
             <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.42)' }}>Student Portal</p>
           </div>
-        </div>
+        </button>
         {onClose && (
           <button
             onClick={onClose}
