@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronDown, Search, FileText, FlaskConical, PlayCircle } from 'lucide-react';
 import { Sidebar } from '../components/Sidebar';
+import { VideoPlayerModal } from '../components/VideoPlayerModal';
+import type { VideoMaterial } from '../components/VideoPlayerModal';
 import { cn } from '../lib/utils';
 import type { CoursePageNav } from '../App';
 
@@ -23,6 +25,13 @@ interface WeekItem {
   format:   string;
   duration: string | null;
   status:   ItemStatus;
+  // Video-specific optional fields
+  id?:            string;
+  url?:           string;
+  progress?:      number;
+  resumeFrom?:    number;
+  relatedSlides?: { id: string; title: string; url: string };
+  relatedLab?:    { id: string; title: string; url: string };
 }
 
 interface Week {
@@ -37,33 +46,58 @@ const WEEKS: Week[] = [
   {
     id: 34, topic: 'Memory & Virtualization',
     items: [
-      { type: 'slides', title: '"Memory Management"',       format: 'PDF',   duration: null,      status: 'viewed'      },
-      { type: 'lab',    title: '"Virtual Memory Lab"',      format: 'PDF',   duration: null,      status: 'not-started' },
-      { type: 'video',  title: '"Segmentation vs Paging"',  format: 'Video', duration: '45 min',  status: 'not-started' },
+      { type: 'slides', title: '"Memory Management"',      format: 'PDF',   duration: null,     status: 'viewed'      },
+      { type: 'lab',    title: '"Virtual Memory Lab"',     format: 'PDF',   duration: null,     status: 'not-started' },
+      {
+        type: 'video', title: '"Segmentation vs Paging"', format: 'Video', duration: '45 min', status: 'not-started',
+        id:   'v-34',
+        url:  'https://www.youtube.com/watch?v=26QPDBe-NB8',
+        relatedSlides: { id: 's-34', title: 'Memory Management',  url: '#' },
+        relatedLab:    { id: 'l-34', title: 'Virtual Memory Lab', url: '#' },
+      },
     ],
   },
   {
     id: 33, topic: 'Process Sync & Concurrency',
     items: [
-      { type: 'slides', title: '"Semaphores & Mutex"',          format: 'PDF',   duration: null,     status: 'viewed' },
-      { type: 'lab',    title: '"Deadlock Detection Lab"',      format: 'PDF',   duration: null,     status: 'viewed' },
-      { type: 'video',  title: '"Producer-Consumer Problem"',   format: 'Video', duration: '38 min', status: 'viewed' },
+      { type: 'slides', title: '"Semaphores & Mutex"',        format: 'PDF',   duration: null,     status: 'viewed' },
+      { type: 'lab',    title: '"Deadlock Detection Lab"',    format: 'PDF',   duration: null,     status: 'viewed' },
+      {
+        type: 'video', title: '"Producer-Consumer Problem"', format: 'Video', duration: '38 min', status: 'viewed',
+        id:   'v-33',
+        url:  'https://www.youtube.com/watch?v=vF8WN4b1qvc',
+        resumeFrom: 1245,
+        relatedSlides: { id: 's-33', title: 'Semaphores & Mutex',      url: '#' },
+        relatedLab:    { id: 'l-33', title: 'Deadlock Detection Lab',  url: '#' },
+      },
     ],
   },
   {
     id: 32, topic: 'Scheduling Algorithms',
     items: [
-      { type: 'slides', title: '"CPU Scheduling"',              format: 'PDF',   duration: null,     status: 'viewed' },
-      { type: 'lab',    title: '"Scheduling Simulation"',       format: 'PDF',   duration: null,     status: 'viewed' },
-      { type: 'video',  title: '"FCFS vs Round Robin"',         format: 'Video', duration: '52 min', status: 'viewed' },
+      { type: 'slides', title: '"CPU Scheduling"',        format: 'PDF',   duration: null,     status: 'viewed' },
+      { type: 'lab',    title: '"Scheduling Simulation"', format: 'PDF',   duration: null,     status: 'viewed' },
+      {
+        type: 'video', title: '"FCFS vs Round Robin"', format: 'Video', duration: '52 min', status: 'viewed',
+        id:  'v-32',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        relatedSlides: { id: 's-32', title: 'CPU Scheduling',        url: '#' },
+        relatedLab:    { id: 'l-32', title: 'Scheduling Simulation', url: '#' },
+      },
     ],
   },
   {
     id: 31, topic: 'Introduction to OS',
     items: [
-      { type: 'slides', title: '"OS Architecture Overview"',    format: 'PDF',   duration: null,     status: 'viewed' },
-      { type: 'lab',    title: '"System Calls Lab"',            format: 'PDF',   duration: null,     status: 'viewed' },
-      { type: 'video',  title: '"Kernel vs User Space"',        format: 'Video', duration: '29 min', status: 'viewed' },
+      { type: 'slides', title: '"OS Architecture Overview"', format: 'PDF',   duration: null,     status: 'viewed' },
+      { type: 'lab',    title: '"System Calls Lab"',         format: 'PDF',   duration: null,     status: 'viewed' },
+      {
+        type: 'video', title: '"Kernel vs User Space"', format: 'Video', duration: '29 min', status: 'viewed',
+        id:  'v-31',
+        url: 'https://www.youtube.com/watch?v=9GDX-IyZ_C8',
+        relatedSlides: { id: 's-31', title: 'OS Architecture Overview', url: '#' },
+        relatedLab:    { id: 'l-31', title: 'System Calls Lab',         url: '#' },
+      },
     ],
   },
 ];
@@ -87,6 +121,35 @@ export default function CourseMaterials({ onBack, onNavigate }: CourseMaterialsP
   const [expandedWeeks,  setExpandedWeeks]  = useState<Set<number>>(new Set([34]));
   const [materialSearch, setMaterialSearch] = useState('');
 
+  // ── Video modal state ───────────────────────────────────────────────────────
+  const [videoModalOpen,    setVideoModalOpen]    = useState(false);
+  const [selectedVideo,     setSelectedVideo]     = useState<VideoMaterial | null>(null);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+
+  // ── All video items in order (for next/previous navigation) ─────────────────
+  const allVideos = useMemo<VideoMaterial[]>(() =>
+    WEEKS.flatMap(week =>
+      week.items
+        .filter((item): item is WeekItem & { url: string } =>
+          item.type === 'video' && !!item.url,
+        )
+        .map(item => ({
+          id:          item.id ?? `v-${week.id}`,
+          type:        'video' as const,
+          title:       item.title,
+          weekNumber:  week.id,
+          weekTopic:   week.topic,
+          duration:    item.duration ?? '',
+          url:         item.url,
+          progress:    item.progress,
+          resumeFrom:  item.resumeFrom,
+          relatedSlides: item.relatedSlides,
+          relatedLab:    item.relatedLab,
+        })),
+    ), []);
+
+  // ── Handlers ─────────────────────────────────────────────────────────────────
+
   function toggleWeek(id: number) {
     setExpandedWeeks((prev) => {
       const next = new Set(prev);
@@ -101,6 +164,43 @@ export default function CourseMaterials({ onBack, onNavigate }: CourseMaterialsP
     const q = materialSearch.trim().toLowerCase();
     if (q) result = result.filter((i) => i.title.toLowerCase().includes(q));
     return result;
+  }
+
+  function handleWatchVideo(item: WeekItem, week: Week) {
+    if (!item.url) return;
+    const video: VideoMaterial = {
+      id:          item.id ?? `v-${week.id}`,
+      type:        'video',
+      title:       item.title,
+      weekNumber:  week.id,
+      weekTopic:   week.topic,
+      duration:    item.duration ?? '',
+      url:         item.url,
+      progress:    item.progress,
+      resumeFrom:  item.resumeFrom,
+      relatedSlides: item.relatedSlides,
+      relatedLab:    item.relatedLab,
+    };
+    const idx = allVideos.findIndex(v => v.id === video.id);
+    setCurrentVideoIndex(idx >= 0 ? idx : 0);
+    setSelectedVideo(video);
+    setVideoModalOpen(true);
+  }
+
+  function handleNextVideo() {
+    const next = allVideos[currentVideoIndex + 1];
+    if (next) {
+      setCurrentVideoIndex(prev => prev + 1);
+      setSelectedVideo(next);
+    }
+  }
+
+  function handlePreviousVideo() {
+    const prev = allVideos[currentVideoIndex - 1];
+    if (prev) {
+      setCurrentVideoIndex(prev => prev - 1);
+      setSelectedVideo(prev);
+    }
   }
 
   const actionLabel = (type: ItemType) =>
@@ -232,11 +332,15 @@ export default function CourseMaterials({ onBack, onNavigate }: CourseMaterialsP
                               </div>
 
                               {viewed ? (
-                                <button className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all">
+                                <button
+                                  onClick={item.type === 'video' ? () => handleWatchVideo(item, week) : undefined}
+                                  className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all"
+                                >
                                   {actionLabel(item.type)}
                                 </button>
                               ) : (
                                 <button
+                                  onClick={item.type === 'video' ? () => handleWatchVideo(item, week) : undefined}
                                   className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold text-white cursor-pointer transition-all hover:brightness-110 active:scale-[0.97]"
                                   style={{ background: '#0d8a7a', boxShadow: '0 2px 8px rgba(13,138,122,0.28)' }}
                                 >
@@ -255,6 +359,22 @@ export default function CourseMaterials({ onBack, onNavigate }: CourseMaterialsP
           </div>
         </main>
       </div>
+
+      {/* Video player modal */}
+      <VideoPlayerModal
+        isOpen={videoModalOpen}
+        onClose={() => {
+          setVideoModalOpen(false);
+          setSelectedVideo(null);
+        }}
+        video={selectedVideo}
+        onNext={handleNextVideo}
+        onPrevious={handlePreviousVideo}
+        hasNext={currentVideoIndex < allVideos.length - 1}
+        hasPrevious={currentVideoIndex > 0}
+        currentIndex={currentVideoIndex}
+        totalCount={allVideos.length}
+      />
     </div>
   );
 }
