@@ -5,9 +5,11 @@ import {
   Users, Megaphone, Calendar, ExternalLink, ChevronRight,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useNotifications } from '../context/NotificationContext';
 
 interface MyCoursesProps {
-  onEnterCourse: () => void;
+  onEnterCourse:      () => void;
+  onContinueLearning: () => void;
 }
 
 // ─── Static data ────────────────────────────────────────────────────────────
@@ -68,9 +70,10 @@ const ACTIVE_RING_C = 2 * Math.PI * ACTIVE_RING_R;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
+export default function MyCourses({ onEnterCourse, onContinueLearning }: MyCoursesProps) {
   const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
+  const { unreadCount, openDrawer } = useNotifications();
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 200);
@@ -136,13 +139,27 @@ export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
             </div>
 
             <button
+              onClick={openDrawer}
               className="relative w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
               aria-label="Notifications"
             >
               <Bell className="w-4 h-4" strokeWidth={1.8} />
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[9px] font-extrabold rounded-full flex items-center justify-center leading-none">
-                3
-              </span>
+              {unreadCount > 0 && (
+                <span
+                  className="absolute top-1 right-1 flex items-center justify-center text-white font-bold leading-none"
+                  style={{
+                    minWidth:     unreadCount > 9 ? 18 : 14,
+                    height:       14,
+                    fontSize:     9,
+                    background:   '#EF4444',
+                    borderRadius: 999,
+                    paddingLeft:  unreadCount > 9 ? 3 : 0,
+                    paddingRight: unreadCount > 9 ? 3 : 0,
+                  }}
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
 
             <button className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors">
@@ -367,6 +384,7 @@ export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
                       <ArrowRight className="w-4 h-4" />
                     </button>
                     <button
+                      onClick={onContinueLearning}
                       className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150 active:scale-[0.97]"
                       style={{
                         background: 'rgba(255,255,255,0.08)',
@@ -376,7 +394,7 @@ export default function MyCourses({ onEnterCourse }: MyCoursesProps) {
                       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
                     >
-                      View Course Details
+                      Continue Learning
                     </button>
                   </div>
                 </div>

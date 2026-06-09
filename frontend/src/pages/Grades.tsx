@@ -1,29 +1,19 @@
 import { useState, useEffect } from 'react';
 import {
-  GraduationCap, LayoutDashboard, BarChart2, FileText, ClipboardList,
-  BookOpen, ArrowLeft, Menu, X, ChevronRight, CheckCircle2, Clock,
+  ChevronRight, CheckCircle2, Clock,
   Trophy, MoreHorizontal, Download,
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { Sidebar } from '../components/Sidebar';
 import type { CoursePageNav } from '../App';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface GradesProps {
-  onLogout:     () => void;
-  onBackToHome: () => void;
-  onNavigate:   (page: CoursePageNav) => void;
+  onBack:     () => void;
+  onNavigate: (page: CoursePageNav) => void;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-
-const SIDEBAR_NAV = [
-  { icon: LayoutDashboard, label: 'Dashboard',   page: 'dashboard'   as CoursePageNav },
-  { icon: BarChart2,       label: 'Grades',       page: 'grades'      as CoursePageNav },
-  { icon: FileText,        label: 'Materials',    page: 'materials'   as CoursePageNav },
-  { icon: ClipboardList,   label: 'Assessments',  page: 'assessments' as CoursePageNav },
-  { icon: BookOpen,        label: 'Resources',    page: 'resources'   as CoursePageNav },
-];
 
 const GRADE_RING_R = 46;
 const GRADE_RING_C = 2 * Math.PI * GRADE_RING_R;
@@ -31,52 +21,25 @@ const GRADE_PCT    = 0.72;
 
 const ASSESSMENTS_ROWS = [
   {
-    borderColor: '#10B981',
-    badge:       'ASSIGNMENT',
-    badgeBg:     '#f0fdf4',
-    badgeFg:     '#059669',
-    title:       'Kernel Module Project',
-    meta:        'Weight: 25% · Oct 12',
-    score:       88,
-    maxScore:    100,
-    barColor:    '#10B981',
-    status:      'GRADED',
-    statusBg:    '#f0fdf4',
-    statusFg:    '#059669',
-    link:        'Review Attempt →',
-    linkColor:   '#0d8a7a',
+    borderColor: '#10B981', badge: 'ASSIGNMENT', badgeBg: '#f0fdf4', badgeFg: '#059669',
+    title: 'Kernel Module Project', meta: 'Weight: 25% · Oct 12',
+    score: 88, maxScore: 100, barColor: '#10B981',
+    status: 'GRADED', statusBg: '#f0fdf4', statusFg: '#059669',
+    link: 'Review Attempt →', linkColor: '#0d8a7a',
   },
   {
-    borderColor: '#F59E0B',
-    badge:       'PHASE TEST',
-    badgeBg:     '#fffbeb',
-    badgeFg:     '#d97706',
-    title:       'Midterm Examination',
-    meta:        'Weight: 30% · Nov 5',
-    score:       64,
-    maxScore:    100,
-    barColor:    '#F59E0B',
-    status:      'GRADED',
-    statusBg:    '#fffbeb',
-    statusFg:    '#d97706',
-    link:        'Review Attempt →',
-    linkColor:   '#0d8a7a',
+    borderColor: '#F59E0B', badge: 'PHASE TEST', badgeBg: '#fffbeb', badgeFg: '#d97706',
+    title: 'Midterm Examination', meta: 'Weight: 30% · Nov 5',
+    score: 64, maxScore: 100, barColor: '#F59E0B',
+    status: 'GRADED', statusBg: '#fffbeb', statusFg: '#d97706',
+    link: 'Review Attempt →', linkColor: '#0d8a7a',
   },
   {
-    borderColor: '#F59E0B',
-    badge:       'LAB',
-    badgeBg:     '#fffbeb',
-    badgeFg:     '#d97706',
-    title:       'Protocol Design Lab',
-    meta:        'Weight: 15% · Dec 2',
-    score:       null,
-    maxScore:    100,
-    barColor:    '#D1D5DB',
-    status:      'IN PROGRESS',
-    statusBg:    '#fffbeb',
-    statusFg:    '#d97706',
-    link:        'View Brief →',
-    linkColor:   '#d97706',
+    borderColor: '#F59E0B', badge: 'LAB', badgeBg: '#fffbeb', badgeFg: '#d97706',
+    title: 'Protocol Design Lab', meta: 'Weight: 15% · Dec 2',
+    score: null, maxScore: 100, barColor: '#D1D5DB',
+    status: 'IN PROGRESS', statusBg: '#fffbeb', statusFg: '#d97706',
+    link: 'View Brief →', linkColor: '#d97706',
   },
 ];
 
@@ -86,122 +49,23 @@ const SCORE_BARS = [
   { label: 'PT3', pct: 0,  color: '#D1D5DB', filled: false },
 ];
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-
-function SidebarContent({
-  onClose,
-  onBackToHome,
-  onNavigate,
-}: {
-  onClose?:     () => void;
-  onBackToHome: () => void;
-  onNavigate:   (page: CoursePageNav) => void;
-}) {
-  return (
-    <div className="flex flex-col h-full">
-      <div className="px-6 pt-6 pb-5 border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#0d8a7a' }}>
-            <GraduationCap className="w-5 h-5 text-white" strokeWidth={2} />
-          </div>
-          <div>
-            <p className="text-slate-900 font-bold text-base leading-none tracking-tight">LearningZone</p>
-            <p className="text-slate-400 text-[11px] mt-1">Student Portal</p>
-          </div>
-        </div>
-        {onClose && (
-          <button onClick={onClose} className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Close menu">
-            <X className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-      <div className="px-5 py-5">
-        <button
-          onClick={onBackToHome}
-          className="w-full flex items-center gap-2.5 h-10 px-4 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150"
-          style={{ color: '#0d8a7a', border: '1.5px solid rgba(13,138,122,0.25)', background: 'rgba(13,138,122,0.06)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.12)')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.06)')}
-        >
-          <ArrowLeft className="w-4 h-4" strokeWidth={2} />
-          Back to Home
-        </button>
-      </div>
-
-      <p className="px-6 mb-2 text-[10px] font-bold tracking-[0.18em] uppercase text-slate-400">Navigation</p>
-
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-        {SIDEBAR_NAV.map(({ icon: Icon, label, page }) => {
-          const active = page === 'grades';
-          return (
-            <button
-              key={label}
-              onClick={() => onNavigate(page)}
-              className={cn(
-                'w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm cursor-pointer transition-all duration-150 text-left',
-                active ? 'bg-teal-50 text-teal-800 font-semibold' : 'text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900'
-              )}
-              style={active ? { boxShadow: 'inset 3px 0 0 #0d8a7a' } : {}}
-            >
-              <Icon className={cn('w-5 h-5 shrink-0', active ? 'text-teal-600' : 'text-slate-400')} strokeWidth={active ? 2.2 : 1.8} />
-              {label}
-              {active && <span className="ml-auto w-2 h-2 rounded-full bg-teal-500" />}
-            </button>
-          );
-        })}
-      </nav>
-    </div>
-  );
-}
-
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function Grades({ onBackToHome, onNavigate }: GradesProps) {
-  const [ready,      setReady]      = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+export default function Grades({ onBack, onNavigate }: GradesProps) {
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 200);
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const h  = (e: MediaQueryListEvent) => { if (e.matches) setDrawerOpen(false); };
-    mq.addEventListener('change', h);
-    return () => mq.removeEventListener('change', h);
-  }, []);
-
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-[240px] shrink-0 flex-col h-full bg-white border-r border-slate-200">
-        <SidebarContent onBackToHome={onBackToHome} onNavigate={onNavigate} />
-      </aside>
+      <Sidebar variant="student" activePage="grades" onNavigate={onNavigate} onBack={onBack} />
 
-      {/* Mobile drawer backdrop */}
-      <div
-        className={cn('fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden', drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none')}
-        onClick={() => setDrawerOpen(false)}
-        aria-hidden="true"
-      />
-      <div className={cn('fixed top-0 left-0 z-50 h-full w-[280px] bg-white border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out lg:hidden', drawerOpen ? 'translate-x-0' : '-translate-x-full')}>
-        <SidebarContent onClose={() => setDrawerOpen(false)} onBackToHome={onBackToHome} onNavigate={onNavigate} />
-      </div>
-
-      {/* Main */}
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">
-
-          {/* Mobile hamburger */}
-          <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200">
-            <button onClick={() => setDrawerOpen(true)} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Open menu">
-              <Menu className="w-5 h-5" />
-            </button>
-            <span className="text-sm font-semibold text-slate-700">Grades</span>
-          </div>
 
           {/* Course header strip */}
           <div className="px-6 lg:px-8 py-8" style={{ background: 'linear-gradient(130deg, #1E1B4B 0%, #3730A3 100%)' }}>
@@ -246,10 +110,7 @@ export default function Grades({ onBackToHome, onNavigate }: GradesProps) {
                 {/* Column 1: Grade ring */}
                 <div className="flex flex-col items-center justify-center gap-4">
                   <div className="relative w-[120px] h-[120px]">
-                    <svg
-                      width="120" height="120" viewBox="0 0 120 120"
-                      style={{ position: 'absolute', transform: 'rotate(-90deg)' }}
-                    >
+                    <svg width="120" height="120" viewBox="0 0 120 120" style={{ position: 'absolute', transform: 'rotate(-90deg)' }}>
                       <circle cx="60" cy="60" r={GRADE_RING_R} fill="none" stroke="#F3F4F6" strokeWidth="9" />
                       <circle
                         cx="60" cy="60" r={GRADE_RING_R}
@@ -316,10 +177,7 @@ export default function Grades({ onBackToHome, onNavigate }: GradesProps) {
                   <div className="flex items-end gap-3" style={{ height: '96px' }}>
                     {SCORE_BARS.map(({ label, pct, color, filled }) => (
                       <div key={label} className="flex-1 flex flex-col items-center gap-1.5">
-                        <span
-                          className="text-[11px] font-bold"
-                          style={{ color: filled ? color : '#9CA3AF' }}
-                        >
+                        <span className="text-[11px] font-bold" style={{ color: filled ? color : '#9CA3AF' }}>
                           {filled ? `${pct}%` : '—'}
                         </span>
                         <div className="w-full flex items-end" style={{ height: '64px' }}>
@@ -333,10 +191,7 @@ export default function Grades({ onBackToHome, onNavigate }: GradesProps) {
                               }}
                             />
                           ) : (
-                            <div
-                              className="w-full rounded-t-md border-2 border-dashed border-slate-200"
-                              style={{ height: '64px' }}
-                            />
+                            <div className="w-full rounded-t-md border-2 border-dashed border-slate-200" style={{ height: '64px' }} />
                           )}
                         </div>
                         <span className="text-[11px] text-slate-400 font-medium">{label}</span>
@@ -366,19 +221,14 @@ export default function Grades({ onBackToHome, onNavigate }: GradesProps) {
                   >
                     <div className="px-5 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center gap-4">
 
-                      {/* Left: badge + title + meta */}
                       <div className="flex-1 min-w-0">
-                        <span
-                          className="inline-flex text-[9px] font-extrabold tracking-[0.14em] uppercase px-2.5 py-1 rounded-full mb-2"
-                          style={{ background: row.badgeBg, color: row.badgeFg }}
-                        >
+                        <span className="inline-flex text-[9px] font-extrabold tracking-[0.14em] uppercase px-2.5 py-1 rounded-full mb-2" style={{ background: row.badgeBg, color: row.badgeFg }}>
                           {row.badge}
                         </span>
                         <p className="text-[15px] font-bold text-slate-900 mb-1">{row.title}</p>
                         <p className="text-xs text-slate-400">{row.meta}</p>
                       </div>
 
-                      {/* Center: score + bar */}
                       <div className="sm:w-36 shrink-0">
                         <p className="text-[10px] font-bold tracking-[0.12em] uppercase text-slate-400 mb-1">Score</p>
                         <p className="text-xl font-extrabold text-slate-900" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
@@ -396,18 +246,11 @@ export default function Grades({ onBackToHome, onNavigate }: GradesProps) {
                         </div>
                       </div>
 
-                      {/* Right: status + link + menu */}
                       <div className="flex sm:flex-col items-center sm:items-end gap-3 shrink-0">
-                        <span
-                          className="text-[10px] font-extrabold tracking-[0.12em] uppercase px-2.5 py-1 rounded-full"
-                          style={{ background: row.statusBg, color: row.statusFg }}
-                        >
+                        <span className="text-[10px] font-extrabold tracking-[0.12em] uppercase px-2.5 py-1 rounded-full" style={{ background: row.statusBg, color: row.statusFg }}>
                           {row.status}
                         </span>
-                        <button
-                          className="text-xs font-semibold cursor-pointer hover:underline underline-offset-2 whitespace-nowrap"
-                          style={{ color: row.linkColor }}
-                        >
+                        <button className="text-xs font-semibold cursor-pointer hover:underline underline-offset-2 whitespace-nowrap" style={{ color: row.linkColor }}>
                           {row.link}
                         </button>
                       </div>
@@ -425,10 +268,7 @@ export default function Grades({ onBackToHome, onNavigate }: GradesProps) {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-extrabold shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #1E1B4B, #3730A3)' }}
-                  >
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-extrabold shrink-0" style={{ background: 'linear-gradient(135deg, #1E1B4B, #3730A3)' }}>
                     SA
                   </div>
                   <p className="text-[15px] font-bold text-slate-900">Feedback from Dr. Sayed Ahmed</p>

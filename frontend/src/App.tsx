@@ -3,16 +3,22 @@ import Login from './pages/Login';
 import MyCourses from './pages/MyCourses';
 import Home from './pages/Home';
 import CourseMaterials from './pages/CourseMaterials';
+import CourseOverview from './pages/CourseOverview';
 import Grades from './pages/Grades';
 import Assessments from './pages/Assessments';
 import Resources from './pages/Resources';
 import CourseInfo from './pages/CourseInfo';
+import Notifications from './pages/Notifications';
+import { NotificationDrawer } from './components/NotificationDrawer';
+import { NotificationToast } from './components/NotificationToast';
 
 export type Page =
   | 'courses'
   | 'dashboard'
-  | 'materials'
   | 'grades'
+  | 'notifications'
+  | 'overview'
+  | 'materials'
   | 'assessments'
   | 'resources'
   | 'course-info';
@@ -45,35 +51,73 @@ function App() {
     return <Login onSuccess={(id: string) => { setUserId(id); setPage('courses'); }} />;
   }
 
-  if (page === 'courses') {
-    return <MyCourses onEnterCourse={() => setPage('dashboard')} />;
-  }
+  // ── Render current page ───────────────────────────────────────────────────
+  function renderPage() {
+    // Level 1: My Courses (top nav only)
+    if (page === 'courses') {
+      return (
+        <MyCourses
+          onEnterCourse={() => setPage('dashboard')}
+          onContinueLearning={() => setPage('materials')}
+        />
+      );
+    }
 
-  const sharedProps = {
-    onLogout:     handleLogout,
-    onBackToHome: () => setPage('courses'),
-    onNavigate:   handleNavigate,
-  };
+    // Level 2: Student pages (student sidebar)
+    if (page === 'dashboard') {
+      return (
+        <Home
+          userId={userId!}
+          onBack={() => setPage('courses')}
+          onEnterCourse={() => setPage('overview')}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
 
-  if (page === 'dashboard') {
+    if (page === 'grades') {
+      return (
+        <Grades
+          onBack={() => setPage('courses')}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
+
+    if (page === 'notifications') {
+      return (
+        <Notifications
+          onBack={() => setPage('courses')}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
+
+    // Level 3: Course pages (course sidebar)
+    const courseBack = () => setPage('dashboard');
+
+    if (page === 'overview')    return <CourseOverview onBack={courseBack} onNavigate={handleNavigate} />;
+    if (page === 'materials')   return <CourseMaterials onBack={courseBack} onNavigate={handleNavigate} />;
+    if (page === 'assessments') return <Assessments    onBack={courseBack} onNavigate={handleNavigate} />;
+    if (page === 'resources')   return <Resources      onBack={courseBack} onNavigate={handleNavigate} />;
+
+    // course-info
     return (
-      <Home
-        userId={userId}
-        {...sharedProps}
-        onEnterCourse={() => setPage('materials')}
+      <CourseInfo
+        onBack={courseBack}
+        onNavigate={handleNavigate}
+        onLogout={handleLogout}
       />
     );
   }
 
-  if (page === 'materials') {
-    return <CourseMaterials onBack={() => setPage('dashboard')} onLogout={handleLogout} onNavigate={handleNavigate} />;
-  }
-
-  if (page === 'grades')      return <Grades      {...sharedProps} />;
-  if (page === 'assessments') return <Assessments {...sharedProps} />;
-  if (page === 'resources')   return <Resources   {...sharedProps} />;
-
-  return <CourseInfo {...sharedProps} />;
+  return (
+    <>
+      {renderPage()}
+      <NotificationDrawer onNavigate={(p) => { setPage(p as Page); }} />
+      <NotificationToast  onNavigate={(p) => { setPage(p as Page); }} />
+    </>
+  );
 }
 
 export default App;

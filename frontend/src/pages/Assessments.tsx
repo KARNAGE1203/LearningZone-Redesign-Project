@@ -1,32 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
-  GraduationCap, LayoutDashboard, BarChart2, FileText, ClipboardList,
-  BookOpen, ArrowLeft, Menu, X, ChevronRight, CheckCircle2, Clock,
+  ChevronRight, CheckCircle2, Clock,
   ChevronDown, Download, ArrowRight,
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { Sidebar } from '../components/Sidebar';
 import type { CoursePageNav } from '../App';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface AssessmentsProps {
-  onLogout:     () => void;
-  onBackToHome: () => void;
-  onNavigate:   (page: CoursePageNav) => void;
+  onBack:     () => void;
+  onNavigate: (page: CoursePageNav) => void;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const SIDEBAR_NAV = [
-  { icon: LayoutDashboard, label: 'Dashboard',   page: 'dashboard'   as CoursePageNav },
-  { icon: BarChart2,       label: 'Grades',       page: 'grades'      as CoursePageNav },
-  { icon: FileText,        label: 'Materials',    page: 'materials'   as CoursePageNav },
-  { icon: ClipboardList,   label: 'Assessments',  page: 'assessments' as CoursePageNav },
-  { icon: BookOpen,        label: 'Resources',    page: 'resources'   as CoursePageNav },
-];
-
 const DATE_SHEET_ROWS = [
-  { assessment: 'Phase Test 1', status: 'Completed', statusBg: '#f0fdf4', statusFg: '#059669', date: 'Oct 3, 2025' },
+  { assessment: 'Phase Test 1', status: 'Completed', statusBg: '#f0fdf4', statusFg: '#059669', date: 'Oct 3, 2025'        },
   { assessment: 'Phase Test 2', status: 'Upcoming',  statusBg: '#fffbeb', statusFg: '#d97706', date: 'May 29, 2026 · 14:00' },
   { assessment: 'Phase Test 3', status: 'Scheduled', statusBg: '#f8fafc', statusFg: '#64748b', date: 'Jun 12, 2026 · 10:00' },
 ];
@@ -36,117 +26,18 @@ const PAST_ASSESSMENTS = [
   { title: 'Lab 5 Submission', date: 'Oct 14, 2025', grade: '85%', gradeColor: '#10B981' },
 ];
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-
-function SidebarContent({
-  onClose,
-  onBackToHome,
-  onNavigate,
-}: {
-  onClose?:     () => void;
-  onBackToHome: () => void;
-  onNavigate:   (page: CoursePageNav) => void;
-}) {
-  return (
-    <div className="flex flex-col h-full">
-      <div className="px-6 pt-6 pb-5 border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#0d8a7a' }}>
-            <GraduationCap className="w-5 h-5 text-white" strokeWidth={2} />
-          </div>
-          <div>
-            <p className="text-slate-900 font-bold text-base leading-none tracking-tight">LearningZone</p>
-            <p className="text-slate-400 text-[11px] mt-1">Student Portal</p>
-          </div>
-        </div>
-        {onClose && (
-          <button onClick={onClose} className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Close menu">
-            <X className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-      <div className="px-5 py-5">
-        <button
-          onClick={onBackToHome}
-          className="w-full flex items-center gap-2.5 h-10 px-4 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150"
-          style={{ color: '#0d8a7a', border: '1.5px solid rgba(13,138,122,0.25)', background: 'rgba(13,138,122,0.06)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.12)')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.06)')}
-        >
-          <ArrowLeft className="w-4 h-4" strokeWidth={2} />
-          Back to Home
-        </button>
-      </div>
-
-      <p className="px-6 mb-2 text-[10px] font-bold tracking-[0.18em] uppercase text-slate-400">Navigation</p>
-
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-        {SIDEBAR_NAV.map(({ icon: Icon, label, page }) => {
-          const active = page === 'assessments';
-          return (
-            <button
-              key={label}
-              onClick={() => onNavigate(page)}
-              className={cn(
-                'w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm cursor-pointer transition-all duration-150 text-left',
-                active ? 'bg-teal-50 text-teal-800 font-semibold' : 'text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900'
-              )}
-              style={active ? { boxShadow: 'inset 3px 0 0 #0d8a7a' } : {}}
-            >
-              <Icon className={cn('w-5 h-5 shrink-0', active ? 'text-teal-600' : 'text-slate-400')} strokeWidth={active ? 2.2 : 1.8} />
-              {label}
-              {active && <span className="ml-auto w-2 h-2 rounded-full bg-teal-500" />}
-            </button>
-          );
-        })}
-      </nav>
-    </div>
-  );
-}
-
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function Assessments({ onBackToHome, onNavigate }: AssessmentsProps) {
-  const [drawerOpen,    setDrawerOpen]    = useState(false);
-  const [pastExpanded,  setPastExpanded]  = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const h  = (e: MediaQueryListEvent) => { if (e.matches) setDrawerOpen(false); };
-    mq.addEventListener('change', h);
-    return () => mq.removeEventListener('change', h);
-  }, []);
+export default function Assessments({ onBack, onNavigate }: AssessmentsProps) {
+  const [pastExpanded, setPastExpanded] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-[240px] shrink-0 flex-col h-full bg-white border-r border-slate-200">
-        <SidebarContent onBackToHome={onBackToHome} onNavigate={onNavigate} />
-      </aside>
+      <Sidebar variant="course" activePage="assessments" onNavigate={onNavigate} onBack={onBack} />
 
-      {/* Mobile drawer */}
-      <div
-        className={cn('fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden', drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none')}
-        onClick={() => setDrawerOpen(false)}
-        aria-hidden="true"
-      />
-      <div className={cn('fixed top-0 left-0 z-50 h-full w-[280px] bg-white border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out lg:hidden', drawerOpen ? 'translate-x-0' : '-translate-x-full')}>
-        <SidebarContent onClose={() => setDrawerOpen(false)} onBackToHome={onBackToHome} onNavigate={onNavigate} />
-      </div>
-
-      {/* Main */}
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">
-
-          {/* Mobile top bar */}
-          <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200">
-            <button onClick={() => setDrawerOpen(true)} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Open menu">
-              <Menu className="w-5 h-5" />
-            </button>
-            <span className="text-sm font-semibold text-slate-700">Assessments</span>
-          </div>
 
           {/* Course header strip */}
           <div className="px-6 lg:px-8 py-8" style={{ background: 'linear-gradient(130deg, #1E1B4B 0%, #3730A3 100%)' }}>
@@ -251,10 +142,7 @@ export default function Assessments({ onBackToHome, onNavigate }: AssessmentsPro
                         style={{ borderBottom: i < DATE_SHEET_ROWS.length - 1 ? '0.5px solid #E5E7EB' : 'none' }}
                       >
                         <span className="text-sm font-semibold text-slate-800">{row.assessment}</span>
-                        <span
-                          className="inline-flex text-[10px] font-extrabold tracking-[0.1em] uppercase px-2.5 py-1 rounded-full w-fit"
-                          style={{ background: row.statusBg, color: row.statusFg }}
-                        >
+                        <span className="inline-flex text-[10px] font-extrabold tracking-[0.1em] uppercase px-2.5 py-1 rounded-full w-fit" style={{ background: row.statusBg, color: row.statusFg }}>
                           {row.status}
                         </span>
                         <span className="text-sm text-slate-600">{row.date}</span>
@@ -307,10 +195,7 @@ export default function Assessments({ onBackToHome, onNavigate }: AssessmentsPro
                         <p className="text-sm font-semibold text-slate-800">{item.title}</p>
                         <p className="text-xs text-slate-400 mt-0.5">{item.date}</p>
                       </div>
-                      <span
-                        className="text-sm font-extrabold px-2.5 py-1 rounded-full bg-emerald-50"
-                        style={{ color: item.gradeColor }}
-                      >
+                      <span className="text-sm font-extrabold px-2.5 py-1 rounded-full bg-emerald-50" style={{ color: item.gradeColor }}>
                         {item.grade}
                       </span>
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">Graded</span>

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
-  GraduationCap, LayoutDashboard, BookOpen, BarChart2,
-  HelpCircle, Bell, Search, ArrowRight, ArrowLeft,
+  Bell, Search, HelpCircle, ArrowRight,
   Clock, FileText, MessageSquare, TrendingUp, AlertTriangle,
-  ChevronRight, Megaphone, Menu, X, ClipboardList,
+  ChevronRight, Megaphone,
 } from 'lucide-react';
+import { Sidebar } from '../components/Sidebar';
 import { cn } from '../lib/utils';
 import type { CoursePageNav } from '../App';
 
@@ -12,50 +12,17 @@ import type { CoursePageNav } from '../App';
 
 interface HomeProps {
   userId:        string;
-  onLogout:      () => void;
-  onBackToHome:  () => void;
+  onBack:        () => void;
   onEnterCourse: () => void;
   onNavigate:    (page: CoursePageNav) => void;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Dashboard',   page: 'dashboard'   as CoursePageNav },
-  { icon: BarChart2,       label: 'Grades',       page: 'grades'      as CoursePageNav },
-  { icon: FileText,        label: 'Materials',    page: 'materials'   as CoursePageNav },
-  { icon: ClipboardList,   label: 'Assessments',  page: 'assessments' as CoursePageNav },
-  { icon: BookOpen,        label: 'Resources',    page: 'resources'   as CoursePageNav },
-];
-
 const STATS = [
-  {
-    label: 'Materials Available',
-    value: '24',
-    sub:   'This week',
-    icon:  FileText,
-    ring:  '#0d8a7a',
-    bg:    '#f0fdf4',
-    fg:    '#059669',
-  },
-  {
-    label: 'Pending Items',
-    value: '3',
-    sub:   'Require attention',
-    icon:  Clock,
-    ring:  '#f59e0b',
-    bg:    '#fffbeb',
-    fg:    '#d97706',
-  },
-  {
-    label: 'Phase Test 2',
-    value: '2 days',
-    sub:   'Jun 2 · 14:00',
-    icon:  AlertTriangle,
-    ring:  '#ef4444',
-    bg:    '#fef2f2',
-    fg:    '#dc2626',
-  },
+  { label: 'Materials Available', value: '24',    sub: 'This week',         icon: FileText,      ring: '#0d8a7a', bg: '#f0fdf4', fg: '#059669' },
+  { label: 'Pending Items',       value: '3',     sub: 'Require attention', icon: Clock,         ring: '#f59e0b', bg: '#fffbeb', fg: '#d97706' },
+  { label: 'Phase Test 2',        value: '2 days', sub: 'Jun 2 · 14:00',   icon: AlertTriangle, ring: '#ef4444', bg: '#fef2f2', fg: '#dc2626' },
 ];
 
 const DEADLINES = [
@@ -65,30 +32,9 @@ const DEADLINES = [
 ];
 
 const ANNOUNCEMENTS = [
-  {
-    initials:    'MH',
-    avatarColor: '#0d8a7a',
-    borderColor: '#0d8a7a',
-    title:       'Exam Schedule Released',
-    body:        'Midterm schedules are now available in the portal.',
-    time:        '1 hour ago',
-  },
-  {
-    initials:    'MA',
-    avatarColor: '#0d8a7a',
-    borderColor: '#7c3aed',
-    title:       'New Reading Material',
-    body:        'Prof. Al-Ibaisi uploaded revision material for Phase Test 2.',
-    time:        'Yesterday',
-  },
-  {
-    initials:    'IT',
-    avatarColor: '#64748b',
-    borderColor: '#94a3b8',
-    title:       'Campus Wi-Fi Maintenance',
-    body:        'Network maintenance this Saturday 2–6 AM. Plan your submissions accordingly.',
-    time:        '3 days ago',
-  },
+  { initials: 'MH', avatarColor: '#0d8a7a', borderColor: '#0d8a7a', title: 'Exam Schedule Released',   body: 'Midterm schedules are now available in the portal.',                              time: '1 hour ago' },
+  { initials: 'MA', avatarColor: '#0d8a7a', borderColor: '#7c3aed', title: 'New Reading Material',     body: 'Prof. Al-Ibaisi uploaded revision material for Phase Test 2.',                  time: 'Yesterday'  },
+  { initials: 'IT', avatarColor: '#64748b', borderColor: '#94a3b8', title: 'Campus Wi-Fi Maintenance', body: 'Network maintenance this Saturday 2–6 AM. Plan your submissions accordingly.',  time: '3 days ago' },
 ];
 
 const COURSE_MINI = [
@@ -96,156 +42,30 @@ const COURSE_MINI = [
   { label: 'Pending',   value: '3',  icon: Clock,    color: '#ef4444', bg: '#fef2f2' },
 ];
 
-// SVG ring math: r=30, circumference ≈ 188.5, A- = 90 %
 const RING_R    = 30;
 const RING_C    = 2 * Math.PI * RING_R;
 const GRADE_PCT = 0.90;
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-
-function SidebarContent({
-  onClose,
-  onBackToHome,
-  onNavigate,
-}: {
-  onClose?:     () => void;
-  onBackToHome?: () => void;
-  onNavigate?:  (page: CoursePageNav) => void;
-}) {
-  return (
-    <div className="flex flex-col h-full">
-
-      {/* Logo */}
-      <div className="px-6 pt-6 pb-5 border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#0d8a7a' }}>
-            <GraduationCap className="w-5 h-5 text-white" strokeWidth={2} />
-          </div>
-          <div>
-            <p className="text-slate-900 font-bold text-base leading-none tracking-tight">LearningZone</p>
-            <p className="text-slate-400 text-[11px] mt-1">Student Portal</p>
-          </div>
-        </div>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors"
-            aria-label="Close menu"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-      {/* Back to Home */}
-      <div className="px-5 py-5">
-        <button
-          onClick={onBackToHome}
-          className="w-full flex items-center gap-2.5 h-10 px-4 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150"
-          style={{ color: '#0d8a7a', border: '1.5px solid rgba(13,138,122,0.25)', background: 'rgba(13,138,122,0.06)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.12)')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(13,138,122,0.06)')}
-        >
-          <ArrowLeft className="w-4 h-4" strokeWidth={2} />
-          Back to Home
-        </button>
-      </div>
-
-      {/* Nav label */}
-      <p className="px-6 mb-2 text-[10px] font-bold tracking-[0.18em] uppercase text-slate-400">
-        Navigation
-      </p>
-
-      {/* Primary nav */}
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ icon: Icon, label, page }) => {
-          const active = page === 'dashboard';
-          return (
-            <button
-              key={label}
-              onClick={() => onNavigate?.(page)}
-              className={cn(
-                'w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm cursor-pointer transition-all duration-150 text-left relative',
-                active
-                  ? 'bg-teal-50 text-teal-800 font-semibold'
-                  : 'text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900'
-              )}
-              style={active ? { boxShadow: 'inset 3px 0 0 #0d8a7a' } : {}}
-            >
-              <Icon
-                className={cn('w-5 h-5 shrink-0', active ? 'text-teal-600' : 'text-slate-400')}
-                strokeWidth={active ? 2.2 : 1.8}
-              />
-              {label}
-              {active && <span className="ml-auto w-2 h-2 rounded-full bg-teal-500" />}
-            </button>
-          );
-        })}
-      </nav>
-
-    </div>
-  );
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function Home({ userId: _userId, onLogout: _onLogout, onBackToHome, onEnterCourse, onNavigate }: HomeProps) {
-  const [search,     setSearch]     = useState('');
-  const [ready,      setReady]      = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+export default function Home({ userId: _userId, onBack, onEnterCourse, onNavigate }: HomeProps) {
+  const [search, setSearch] = useState('');
+  const [ready,  setReady]  = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 250);
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const handler = (e: MediaQueryListEvent) => { if (e.matches) setDrawerOpen(false); };
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:flex lg:w-[240px] shrink-0 flex-col h-full bg-white border-r border-slate-200">
-        <SidebarContent onBackToHome={onBackToHome} onNavigate={onNavigate} />
-      </aside>
+      <Sidebar variant="student" activePage="dashboard" onNavigate={onNavigate} onBack={onBack} />
 
-      {/* ── Mobile drawer backdrop ── */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
-          drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        )}
-        onClick={() => setDrawerOpen(false)}
-        aria-hidden="true"
-      />
-      {/* ── Mobile drawer panel ── */}
-      <div
-        className={cn(
-          'fixed top-0 left-0 z-50 h-full w-[280px] bg-white border-r border-slate-200 flex flex-col',
-          'transition-transform duration-300 ease-in-out lg:hidden',
-          drawerOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        <SidebarContent onClose={() => setDrawerOpen(false)} onBackToHome={onBackToHome} onNavigate={onNavigate} />
-      </div>
-
-      {/* ── Main area ── */}
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
 
         {/* Top Navbar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center gap-3 px-4 md:px-6 lg:px-8 shrink-0 z-20">
-          <button
-            className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors shrink-0"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
 
           <div className="hidden md:flex items-center gap-2 text-sm shrink-0 min-w-0">
             <span className="text-slate-400 hover:text-slate-600 cursor-pointer transition-colors whitespace-nowrap">My Courses</span>
@@ -267,23 +87,14 @@ export default function Home({ userId: _userId, onLogout: _onLogout, onBackToHom
           </div>
 
           <div className="flex items-center gap-1 shrink-0 ml-auto md:ml-0">
-            <button
-              className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
-              aria-label="Notifications"
-            >
+            <button className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Notifications">
               <Bell className="w-5 h-5" strokeWidth={1.8} />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
             </button>
-            <button
-              className="hidden sm:flex w-10 h-10 rounded-xl items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
-              aria-label="Help"
-            >
+            <button className="hidden sm:flex w-10 h-10 rounded-xl items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors" aria-label="Help">
               <HelpCircle className="w-5 h-5" strokeWidth={1.8} />
             </button>
-            <button
-              className="w-10 h-10 rounded-full cursor-pointer ml-1 ring-2 ring-transparent hover:ring-teal-400 transition-all duration-200 overflow-hidden"
-              aria-label="Profile"
-            >
+            <button className="w-10 h-10 rounded-full cursor-pointer ml-1 ring-2 ring-transparent hover:ring-teal-400 transition-all duration-200 overflow-hidden" aria-label="Profile">
               <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #7c3aed, #0d8a7a)' }}>
                 <span className="text-white text-xs font-bold">DS</span>
               </div>
@@ -313,7 +124,6 @@ export default function Home({ userId: _userId, onLogout: _onLogout, onBackToHom
                 <rect width="100%" height="100%" fill="url(#dots)" />
               </svg>
             </div>
-
             <div
               className="relative z-10 max-w-2xl"
               style={{
@@ -393,11 +203,7 @@ export default function Home({ userId: _userId, onLogout: _onLogout, onBackToHom
 
                     {/* SVG grade ring */}
                     <div className="relative shrink-0 w-[68px] h-[68px] sm:w-[76px] sm:h-[76px] flex items-center justify-center">
-                      <svg
-                        width="100%" height="100%"
-                        viewBox="0 0 70 70"
-                        style={{ position: 'absolute', transform: 'rotate(-90deg)' }}
-                      >
+                      <svg width="100%" height="100%" viewBox="0 0 70 70" style={{ position: 'absolute', transform: 'rotate(-90deg)' }}>
                         <circle cx="35" cy="35" r={RING_R} fill="none" stroke="#f1f5f9" strokeWidth="5" />
                         <circle
                           cx="35" cy="35" r={RING_R}
