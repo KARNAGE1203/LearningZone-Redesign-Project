@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronDown, Search, FileText, FlaskConical, PlayCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, FileText, FlaskConical, PlayCircle } from 'lucide-react';
 import { Sidebar } from '../components/Sidebar';
 import { VideoPlayerModal } from '../components/VideoPlayerModal';
 import type { VideoMaterial } from '../components/VideoPlayerModal';
@@ -214,22 +214,28 @@ export default function CourseMaterials({ onBack, onNavigate }: CourseMaterialsP
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">
 
-          {/* Course header */}
-          <div className="px-6 lg:px-8 pt-9">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#dc2626' }}>
-                <span className="text-white text-[10px] font-extrabold leading-none">CS</span>
-              </div>
-              <span className="text-xs font-bold tracking-[0.14em] uppercase text-slate-400">CS301</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-[28px] font-extrabold text-slate-900 tracking-tight mb-6">
+          {/* Course header strip */}
+          <div className="px-6 lg:px-8 py-8" style={{ background: 'linear-gradient(130deg, #1E1B4B 0%, #3730A3 100%)' }}>
+            <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              MATERIALS · CTEC1704D_2025_604
+            </p>
+            <h1 className="text-2xl sm:text-[26px] font-extrabold text-white tracking-tight mb-1">
               Operating Systems and Networks
             </h1>
+            <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              Academic Year 2025/26 · Block 4
+            </p>
+          </div>
+
+          {/* Breadcrumb */}
+          <div className="px-6 lg:px-8 py-3 flex items-center gap-2 text-sm border-b border-slate-100 bg-white">
+            <span className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">My Courses</span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+            <span className="font-semibold" style={{ color: '#0d8a7a' }}>Operating Systems and Networks</span>
           </div>
 
           {/* Materials content */}
-          <div className="px-6 lg:px-8 pb-12">
+          <div className="px-6 lg:px-8 py-6 pb-12">
 
             {/* Filter + search row */}
             <div className="flex flex-wrap items-center gap-3 mb-6">
