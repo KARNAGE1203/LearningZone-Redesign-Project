@@ -3,16 +3,18 @@ import {
   GraduationCap, Search, Bell, ArrowRight, CheckCircle2,
   Globe, Mountain, Building2, CalendarDays, Library, Headphones,
   Users, Megaphone, Calendar, ExternalLink, ChevronRight,
-  Database, Cpu, Code2, Server,
+  Network,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useNotifications } from '../context/NotificationContext';
 import { AvatarDropdown } from '../components/AvatarDropdown';
+import { TIMELINE } from '../data/courses';
 import type { CoursePageNav } from '../App';
 
 interface HomeProps {
   onEnterCourse:      () => void;
   onContinueLearning: () => void;
+  onViewCourse:       (block: number) => void;
   onNavigate:         (page: CoursePageNav) => void;
   onLogout:           () => void;
 }
@@ -21,13 +23,6 @@ interface HomeProps {
 // Static page content used to render the dashboard-like landing homepage.
 
 const NAV_LINKS = ['My Courses', 'Calendar', 'Library', 'Support'] as const;
-
-const TIMELINE = [
-  { block: 1, course: 'Database Design',      grade: '68%', status: 'done'   as const, abbr: 'DB', color: '#0369a1', accentBg: '#e0f2fe', icon: Database },
-  { block: 2, course: 'Fundamental CS',        grade: '74%', status: 'done'   as const, abbr: 'CS', color: '#7c3aed', accentBg: '#ede9fe', icon: Cpu },
-  { block: 3, course: 'Computer Programming',  grade: '81%', status: 'done'   as const, abbr: 'CP', color: '#059669', accentBg: '#d1fae5', icon: Code2 },
-  { block: 4, course: 'OS & Networks',         grade: '67%', status: 'active' as const, abbr: 'OS', color: '#0d8a7a', accentBg: '#ccfbf1', icon: Server },
-];
 
 const ANNOUNCEMENTS = [
   // Announcement cards shown in the home page feed.
@@ -77,7 +72,7 @@ const ACTIVE_RING_C = 2 * Math.PI * ACTIVE_RING_R;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function Home({ onEnterCourse, onContinueLearning, onNavigate, onLogout }: HomeProps) {
+export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, onNavigate, onLogout }: HomeProps) {
   // Delay used to animate in the hero section once the page mounts.
   const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
@@ -216,6 +211,58 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
             className="absolute top-1/2 left-[35%] w-48 h-48 rounded-full"
             style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.1), transparent 70%)' }}
           />
+          {/* Knowledge-network illustration — academic theme, right panel */}
+          <div
+            className="hidden lg:block absolute right-0 top-0 bottom-0"
+            style={{
+              width: '52%',
+              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 22%, black 48%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 22%, black 48%)',
+            }}
+          >
+            <svg
+              viewBox="0 0 500 240"
+              preserveAspectRatio="xMaxYMid slice"
+              className="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Low-poly facets */}
+              <polygon points="250,40 340,20 320,90"  fill="rgba(167,139,250,0.07)" />
+              <polygon points="320,90 400,60 380,140" fill="rgba(94,234,212,0.06)" />
+              <polygon points="320,90 380,140 300,170" fill="rgba(139,92,246,0.05)" />
+              <polygon points="400,60 470,90 460,160" fill="rgba(52,211,153,0.06)" />
+
+              {/* Connection lines */}
+              <line x1="320" y1="110" x2="230" y2="60"  stroke="rgba(196,181,253,0.25)" strokeWidth="1.3" />
+              <line x1="320" y1="110" x2="420" y2="70"  stroke="rgba(94,234,212,0.25)"  strokeWidth="1.3" />
+              <line x1="320" y1="110" x2="430" y2="170" stroke="rgba(110,231,183,0.22)" strokeWidth="1.3" />
+              <line x1="320" y1="110" x2="250" y2="180" stroke="rgba(196,181,253,0.2)"  strokeWidth="1.2" />
+              <line x1="420" y1="70"  x2="470" y2="30"  stroke="rgba(94,234,212,0.18)"  strokeWidth="1" />
+              <line x1="430" y1="170" x2="480" y2="200" stroke="rgba(110,231,183,0.18)" strokeWidth="1" />
+              <line x1="230" y1="60"  x2="180" y2="30"  stroke="rgba(196,181,253,0.16)" strokeWidth="1" />
+              <line x1="250" y1="180" x2="200" y2="210" stroke="rgba(196,181,253,0.16)" strokeWidth="1" />
+
+              {/* Small satellite nodes */}
+              <circle cx="470" cy="30"  r="3.5" fill="rgba(94,234,212,0.4)"  stroke="rgba(94,234,212,0.6)"  strokeWidth="1" />
+              <circle cx="480" cy="200" r="3.5" fill="rgba(110,231,183,0.4)" stroke="rgba(110,231,183,0.6)" strokeWidth="1" />
+              <circle cx="180" cy="30"  r="3.5" fill="rgba(196,181,253,0.4)" stroke="rgba(196,181,253,0.6)" strokeWidth="1" />
+              <circle cx="200" cy="210" r="3.5" fill="rgba(196,181,253,0.4)" stroke="rgba(196,181,253,0.6)" strokeWidth="1" />
+              <circle cx="430" cy="170" r="6"   fill="rgba(110,231,183,0.28)" stroke="rgba(110,231,183,0.5)" strokeWidth="1.2" />
+
+              {/* Secondary nodes */}
+              <circle cx="230" cy="60" r="5" fill="rgba(94,234,212,0.32)"  stroke="rgba(94,234,212,0.55)"  strokeWidth="1.2" />
+              <circle cx="420" cy="70" r="5" fill="rgba(167,139,250,0.28)" stroke="rgba(196,181,253,0.5)" strokeWidth="1.2" />
+
+              {/* Central hub — graduation cap */}
+              <circle cx="320" cy="110" r="30" fill="none" stroke="rgba(196,181,253,0.08)" strokeWidth="10" />
+              <circle cx="320" cy="110" r="20" fill="rgba(99,102,241,0.22)" stroke="rgba(196,181,253,0.45)" strokeWidth="1.5" />
+              <g transform="translate(309.8,99.8) scale(0.85)" fill="none" stroke="rgba(233,229,255,0.92)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.17a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
+                <path d="M22 10v6" />
+                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
+              </g>
+            </svg>
+          </div>
         </div>
 
         <div className="relative z-10 max-w-screen-2xl mx-auto px-6 lg:px-10 py-12 lg:py-16">
@@ -312,6 +359,12 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
               <div
                 className="absolute -top-20 -right-16 w-72 h-72 rounded-full"
                 style={{ background: 'radial-gradient(circle, rgba(13,138,122,0.14), transparent 70%)' }}
+              />
+              {/* Decorative course icon */}
+              <Network
+                className="hidden sm:block absolute -right-10 -bottom-12 w-72 h-72"
+                style={{ color: '#5eead4', opacity: 0.07 }}
+                strokeWidth={0.8}
               />
             </div>
 
@@ -440,14 +493,12 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {TIMELINE.map(({ block, course, grade, status, abbr, color, accentBg, icon: Icon }) => {
               const active = status === 'active';
-              const ringR  = 15;
-              const ringC  = 2 * Math.PI * ringR;
 
               /* ── Active card (dark / teal) ─────────────────── */
               if (active) return (
                 <div
                   key={block}
-                  className="relative rounded-2xl overflow-hidden flex flex-col"
+                  className="relative rounded-2xl overflow-hidden flex flex-col h-full"
                   style={{
                     background:   'linear-gradient(145deg, #0d1b2a 0%, #0d3b38 100%)',
                     border:       '1.5px solid rgba(13,138,122,0.5)',
@@ -497,24 +548,12 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
                       <h4 className="text-sm font-bold text-white leading-snug">{course}</h4>
                     </div>
 
-                    {/* Grade + mini progress ring */}
-                    <div className="flex items-end justify-between mb-5">
-                      <div>
-                        <p className="text-2xl font-extrabold text-white leading-none">{grade}</p>
-                        <p className="text-[11px] mt-0.5 font-medium" style={{ color: 'rgba(94,234,212,0.6)' }}>
-                          In Progress
-                        </p>
-                      </div>
-                      <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: 'rotate(-90deg)' }}>
-                        <circle cx="19" cy="19" r={ringR} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
-                        <circle
-                          cx="19" cy="19" r={ringR}
-                          fill="none" stroke="#0d8a7a" strokeWidth="3.5" strokeLinecap="round"
-                          strokeDasharray={ringC}
-                          strokeDashoffset={ready ? ringC * 0.33 : ringC}
-                          style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16,1,0.3,1) 0.3s', filter: 'drop-shadow(0 0 4px rgba(13,138,122,0.7))' }}
-                        />
-                      </svg>
+                    {/* Grade */}
+                    <div className="mb-5">
+                      <p className="text-2xl font-extrabold text-white leading-none">{grade}</p>
+                      <p className="text-[11px] mt-0.5 font-medium" style={{ color: 'rgba(94,234,212,0.6)' }}>
+                        In Progress
+                      </p>
                     </div>
 
                     {/* CTAs */}
@@ -535,8 +574,8 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
               return (
                 <div
                   key={block}
-                  onClick={onEnterCourse}
-                  className="relative bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer group"
+                  onClick={() => onViewCourse(block)}
+                  className="relative bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col h-full cursor-pointer group"
                 >
                   {/* Coloured top bar */}
                   <div className="h-1 transition-opacity group-hover:opacity-90" style={{ background: color }} />
@@ -624,7 +663,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
                   <Megaphone className="w-4 h-4 text-slate-500" strokeWidth={1.8} />
                 </div>
                 <h3 className="font-bold text-slate-800">University Announcements</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 ml-auto">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 ml-auto">
                   2 unread
                 </span>
               </div>

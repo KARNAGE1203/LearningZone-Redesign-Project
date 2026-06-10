@@ -11,12 +11,16 @@ import type { CoursePageNav } from '../App';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface SidebarProps {
-  variant:    'student' | 'course';
-  activePage: string;
-  onNavigate: (page: CoursePageNav) => void;
-  onBack:     () => void;
-  onHome?:    () => void;
-  onLogout?:  () => void;
+  variant:      'student' | 'course' | 'archive';
+  activePage:   string;
+  onNavigate:   (page: CoursePageNav) => void;
+  onBack:       () => void;
+  onHome?:      () => void;
+  onLogout?:    () => void;
+  /** Override the "course identity" block shown for the course/archive variants. */
+  courseAbbr?:  string;
+  courseLabel?: string;
+  courseCode?:  string;
 }
 
 // ─── Nav config ───────────────────────────────────────────────────────────────
@@ -47,8 +51,11 @@ function Content({
   onHome,
   onLogout,
   onClose,
+  courseAbbr,
+  courseLabel,
+  courseCode,
 }: SidebarProps & { onClose?: () => void }) {
-  const navItems = variant === 'student' ? STUDENT_NAV : COURSE_NAV;
+  const navItems = variant === 'student' ? STUDENT_NAV : variant === 'course' ? COURSE_NAV : [];
 
   // Shared sidebar content for both desktop and mobile drawer.
   return (
@@ -100,76 +107,87 @@ function Content({
           }}
         >
           <ArrowLeft className="w-3.5 h-3.5 shrink-0" strokeWidth={2} />
-          {variant === 'student' ? 'Back to Home' : 'Back to Dashboard'}
+          {variant === 'course' ? 'Back to Dashboard' : 'Back to Home'}
         </button>
       </div>
 
       {/* Divider */}
       <div className="mx-4 mb-4 shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
 
-      {/* Course identity block — course variant only */}
-      {variant === 'course' && (
+      {/* Course identity block — course/archive variants only */}
+      {(variant === 'course' || variant === 'archive') && (
         <div className="px-4 mb-4 flex items-center gap-3 shrink-0">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-extrabold text-white shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)' }}
           >
-            OS
+            {courseAbbr ?? 'OS'}
           </div>
           <div className="min-w-0">
-            <p className="text-white text-[13px] font-semibold leading-snug truncate">OS &amp; Networks</p>
-            <p className="text-[11px] truncate mt-0.5" style={{ color: 'rgba(255,255,255,0.42)' }}>CTEC1704D</p>
+            <p className="text-white text-[13px] font-semibold leading-snug truncate">{courseLabel ?? 'OS & Networks'}</p>
+            <p className="text-[11px] truncate mt-0.5" style={{ color: 'rgba(255,255,255,0.42)' }}>{courseCode ?? 'CTEC1704D'}</p>
           </div>
         </div>
       )}
 
       {/* Section label */}
-      <p
-        className="px-5 mb-1.5 text-[9px] font-extrabold tracking-[0.2em] uppercase shrink-0"
-        style={{ color: 'rgba(255,255,255,0.32)' }}
-      >
-        {variant === 'student' ? 'Overview' : 'Course Navigation'}
-      </p>
+      {navItems.length > 0 && (
+        <p
+          className="px-5 mb-1.5 text-[9px] font-extrabold tracking-[0.2em] uppercase shrink-0"
+          style={{ color: 'rgba(255,255,255,0.32)' }}
+        >
+          {variant === 'student' ? 'Overview' : 'Course Navigation'}
+        </p>
+      )}
 
       {/* Scrollable nav area */}
       <div className="flex-1 overflow-y-auto">
 
         {/* Primary nav items */}
-        <nav className="px-3 space-y-0.5">
-          {navItems.map(({ icon: Icon, label, page }) => {
-            const active = page === activePage;
-            return (
-              <button
-                key={label}
-                onClick={() => { onNavigate(page); onClose?.(); }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] cursor-pointer transition-all duration-150 text-left"
-                style={
-                  active
-                    ? {
-                        background: 'rgba(255,255,255,0.15)',
-                        color: 'white',
-                        fontWeight: 700,
-                        boxShadow: 'inset 3px 0 0 rgba(255,255,255,0.85)',
-                      }
-                    : { color: 'rgba(255,255,255,0.55)' }
-                }
-                onMouseEnter={(e) => {
-                  if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
-                }}
-                onMouseLeave={(e) => {
-                  if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.55)';
-                }}
-              >
-                <Icon
-                  className="w-4 h-4 shrink-0"
-                  style={{ color: active ? 'white' : 'rgba(255,255,255,0.5)' }}
-                  strokeWidth={active ? 2.2 : 1.8}
-                />
-                {label}
-              </button>
-            );
-          })}
-        </nav>
+        {navItems.length > 0 && (
+          <nav className="px-3 space-y-0.5">
+            {navItems.map(({ icon: Icon, label, page }) => {
+              const active = page === activePage;
+              return (
+                <button
+                  key={label}
+                  onClick={() => { onNavigate(page); onClose?.(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] cursor-pointer transition-all duration-150 text-left"
+                  style={
+                    active
+                      ? {
+                          background: 'rgba(255,255,255,0.15)',
+                          color: 'white',
+                          fontWeight: 700,
+                          boxShadow: 'inset 3px 0 0 rgba(255,255,255,0.85)',
+                        }
+                      : { color: 'rgba(255,255,255,0.55)' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.55)';
+                  }}
+                >
+                  <Icon
+                    className="w-4 h-4 shrink-0"
+                    style={{ color: active ? 'white' : 'rgba(255,255,255,0.5)' }}
+                    strokeWidth={active ? 2.2 : 1.8}
+                  />
+                  {label}
+                </button>
+              );
+            })}
+          </nav>
+        )}
+
+        {/* Archive notice */}
+        {variant === 'archive' && (
+          <p className="px-5 text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            This course has been completed. You're viewing a read-only summary.
+          </p>
+        )}
 
         {/* ── Course quick-links (student sidebar only) ──────────────────── */}
         {variant === 'student' && (
@@ -243,7 +261,7 @@ function Content({
 
 // ─── Exported Sidebar ─────────────────────────────────────────────────────────
 
-export function Sidebar({ variant, activePage, onNavigate, onBack, onHome, onLogout }: SidebarProps) {
+export function Sidebar({ variant, activePage, onNavigate, onBack, onHome, onLogout, courseAbbr, courseLabel, courseCode }: SidebarProps) {
   const [open, setOpen] = useState(false);
 
   // Close the mobile drawer when we switch to desktop widths.
@@ -254,7 +272,7 @@ export function Sidebar({ variant, activePage, onNavigate, onBack, onHome, onLog
     return () => mq.removeEventListener('change', h);
   }, []);
 
-  const cp = { variant, activePage, onNavigate, onBack, onHome, onLogout };
+  const cp = { variant, activePage, onNavigate, onBack, onHome, onLogout, courseAbbr, courseLabel, courseCode };
 
   return (
     <>

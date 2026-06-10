@@ -7,6 +7,7 @@ import Grades from './pages/Grades';
 import Assessments from './pages/Assessments';
 import Resources from './pages/Resources';
 import CourseInfo from './pages/CourseInfo';
+import CourseSummary from './pages/CourseSummary';
 import Notifications from './pages/Notifications';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -25,7 +26,8 @@ export type Page =
   | 'materials'
   | 'assessments'
   | 'resources'
-  | 'course-info';
+  | 'course-info'
+  | 'course-summary';
 
 export type CoursePageNav = Exclude<Page, 'home'>;
 
@@ -39,6 +41,7 @@ function App() {
     }
   });
   const [page, setPage] = useState<Page>('home');
+  const [archiveBlock, setArchiveBlock] = useState<number>(1);
 
   function handleLogout() {
     localStorage.removeItem('lz_token');
@@ -65,6 +68,20 @@ function App() {
         <Home
           onEnterCourse={() => setPage('dashboard')}
           onContinueLearning={() => setPage('materials')}
+          onViewCourse={(block) => { setArchiveBlock(block); setPage('course-summary'); }}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+        />
+      );
+    }
+
+    // Read-only summary of a completed course (Blocks 1–3 on the Home timeline).
+    if (page === 'course-summary') {
+      return (
+        <CourseSummary
+          courseBlock={archiveBlock}
+          onBack={() => setPage('home')}
+          onHome={() => setPage('home')}
           onNavigate={handleNavigate}
           onLogout={handleLogout}
         />
