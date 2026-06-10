@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  GraduationCap, Search, Bell, Settings, ArrowRight, CheckCircle2,
+  GraduationCap, Search, Bell, ArrowRight, CheckCircle2,
   Globe, Mountain, Building2, CalendarDays, Library, Headphones,
   Users, Megaphone, Calendar, ExternalLink, ChevronRight,
 } from 'lucide-react';
@@ -177,14 +177,6 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
             </button>
 
             <AvatarDropdown onNavigate={onNavigate} onLogout={onLogout} variant="topnav" />
-
-            <button
-              onClick={() => onNavigate('settings')}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors"
-              aria-label="Settings"
-            >
-              <Settings className="w-4 h-4" strokeWidth={1.8} />
-            </button>
           </div>
         </div>
       </header>
