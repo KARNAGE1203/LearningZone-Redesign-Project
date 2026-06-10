@@ -52,7 +52,7 @@ function Content({
 
   // Shared sidebar content for both desktop and mobile drawer.
   return (
-    <div className="flex flex-col h-full select-none overflow-hidden">
+    <div className="flex flex-col h-full select-none">
 
       {/* Logo — click navigates to Dashboard (home) */}
       <div className="px-5 pt-6 pb-4 flex items-center justify-between shrink-0">
