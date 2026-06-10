@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -43,6 +43,18 @@ function App() {
   const [page, setPage] = useState<Page>('home');
   const [archiveBlock, setArchiveBlock] = useState<number>(1);
 
+  // Helpers to map between app pages and readable paths
+  const pageToPath = (p: Page) => (p === 'home' ? '/' : `/${p}`);
+  const pathToPage = (path: string): Page => {
+    const p = path.replace(/^\/+/, '').split('/')[0];
+    if (!p) return 'home';
+    const known: Page[] = [
+      'dashboard','grades','notifications','profile','settings',
+      'materials','assessments','resources','course-info','course-summary',
+    ];
+    return (known.includes(p as Page) ? (p as Page) : 'home');
+  };
+
   function handleLogout() {
     localStorage.removeItem('lz_token');
     localStorage.removeItem('lz_user');
@@ -52,12 +64,39 @@ function App() {
 
   // Simple page switcher used by sidebars and buttons.
   function handleNavigate(p: CoursePageNav) {
+    const path = pageToPath(p as Page);
+    try { window.history.pushState({ page: p }, '', path); } catch {}
     setPage(p);
   }
 
+  // General navigator that also supports 'home'
+  function navigate(p: Page) {
+    if (p === 'home') {
+      const path = pageToPath(p);
+      try { window.history.pushState({ page: p }, '', path); } catch {}
+      setPage('home');
+      return;
+    }
+    handleNavigate(p as CoursePageNav);
+  }
+
+  // Keep app state in sync with browser history (back/forward and direct links)
+  useEffect(() => {
+    // Initialize page from history state or location
+    const initial = (history.state && (history.state as any).page) ? (history.state as any).page as Page : pathToPage(location.pathname);
+    setPage(initial);
+
+    const onPop = (e: PopStateEvent) => {
+      const statePage = e.state?.page ?? pathToPage(location.pathname);
+      setPage(statePage as Page);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
   // If no user is logged in, render the login page only.
   if (!userId) {
-    return <Login onSuccess={(id: string) => { setUserId(id); setPage('home'); }} />;
+     return <Login onSuccess={(id: string) => { setUserId(id); navigate('home'); }} />;
   }
 
   // ── Render current page ───────────────────────────────────────────────────
@@ -66,9 +105,9 @@ function App() {
     if (page === 'home') {
       return (
         <Home
-          onEnterCourse={() => setPage('dashboard')}
-          onContinueLearning={() => setPage('materials')}
-          onViewCourse={(block) => { setArchiveBlock(block); setPage('course-summary'); }}
+          onEnterCourse={() => handleNavigate('dashboard')}
+          onContinueLearning={() => handleNavigate('materials')}
+          onViewCourse={(block) => { setArchiveBlock(block); handleNavigate('course-summary'); }}
           onNavigate={handleNavigate}
           onLogout={handleLogout}
         />
@@ -80,8 +119,8 @@ function App() {
       return (
         <CourseSummary
           courseBlock={archiveBlock}
-          onBack={() => setPage('home')}
-          onHome={() => setPage('home')}
+              onBack={() => navigate('home')}
+              onHome={() => navigate('home')}
           onNavigate={handleNavigate}
           onLogout={handleLogout}
         />
@@ -93,7 +132,7 @@ function App() {
       return (
         <Dashboard
           userId={userId!}
-          onBack={() => setPage('home')}
+              onBack={() => navigate('home')}
           onNavigate={handleNavigate}
         />
       );
@@ -102,7 +141,7 @@ function App() {
     if (page === 'grades') {
       return (
         <Grades
-          onBack={() => setPage('home')}
+              onBack={() => navigate('home')}
           onNavigate={handleNavigate}
         />
       );
@@ -111,7 +150,7 @@ function App() {
     if (page === 'notifications') {
       return (
         <Notifications
-          onBack={() => setPage('home')}
+              onBack={() => navigate('home')}
           onNavigate={handleNavigate}
         />
       );
@@ -120,7 +159,7 @@ function App() {
     if (page === 'profile') {
       return (
         <Profile
-          onBack={() => setPage('home')}
+              onBack={() => navigate('home')}
           onNavigate={handleNavigate}
           onLogout={handleLogout}
         />
@@ -130,7 +169,7 @@ function App() {
     if (page === 'settings') {
       return (
         <Settings
-          onBack={() => setPage('home')}
+              onBack={() => navigate('home')}
           onNavigate={handleNavigate}
           onLogout={handleLogout}
         />
@@ -140,8 +179,8 @@ function App() {
     // Level 3: Course-specific pages that use the course sidebar.
 
     // Level 3: Course pages (course sidebar)
-    const courseBack = () => setPage('dashboard');
-    const courseHome = () => setPage('home');
+    const courseBack = () => handleNavigate('dashboard');
+    const courseHome = () => navigate('home');
 
     if (page === 'materials')   return <CourseMaterials onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
     if (page === 'assessments') return <Assessments    onBack={courseBack} onHome={courseHome} onNavigate={handleNavigate} />;
@@ -161,8 +200,8 @@ function App() {
   return (
     <>
       {renderPage()}
-      <NotificationDrawer onNavigate={(p) => { setPage(p as Page); }} />
-      <NotificationToast  onNavigate={(p) => { setPage(p as Page); }} />
+      <NotificationDrawer onNavigate={(p) => { handleNavigate(p as CoursePageNav); }} />
+      <NotificationToast  onNavigate={(p) => { handleNavigate(p as CoursePageNav); }} />
     </>
   );
 }

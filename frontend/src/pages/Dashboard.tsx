@@ -65,7 +65,7 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="student" activePage="dashboard" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="student" activePage="dashboard" onNavigate={onNavigate} onBack={onBack} onHelp={openDrawer} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         {/* Main panel contains the top navbar and scrollable dashboard content. */}
@@ -117,6 +117,7 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
               )}
             </button>
             <button
+              onClick={openDrawer}
               className="hidden sm:flex w-10 h-10 rounded-xl items-center justify-center text-slate-500 hover:bg-slate-100 cursor-pointer transition-colors"
               aria-label="Help"
             >
@@ -370,7 +371,10 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
                       Continue Learning
                       <ArrowRight className="w-4 h-4" />
                     </button>
-                    <button className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-all duration-150 active:scale-[0.97]">
+                    <button
+                      onClick={() => onNavigate('course-info')}
+                      className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-all duration-150 active:scale-[0.97]"
+                    >
                       View Syllabus
                     </button>
                     <button className="hidden sm:flex ml-auto items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer transition-colors">
@@ -434,7 +438,11 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
                     </div>
                     <h3 className="font-bold text-slate-800">Upcoming Deadlines</h3>
                   </div>
-                  <button className="text-xs font-semibold cursor-pointer hover:underline" style={{ color: '#0d8a7a' }}>
+                  <button
+                    onClick={() => onNavigate('notifications')}
+                    className="text-xs font-semibold cursor-pointer hover:underline"
+                    style={{ color: '#0d8a7a' }}
+                  >
                     View all
                   </button>
                 </div>
@@ -463,7 +471,10 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
                   ))}
                 </div>
 
-                <button className="w-full mt-4 py-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-slate-300 rounded-xl">
+                <button
+                  onClick={() => onNavigate('notifications')}
+                  className="w-full mt-4 py-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-teal-300 rounded-xl"
+                >
                   View Full Calendar
                 </button>
               </div>

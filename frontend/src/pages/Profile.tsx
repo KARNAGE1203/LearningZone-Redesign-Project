@@ -3,6 +3,7 @@ import {
   Camera, CheckCircle2, User, Mail, GraduationCap, Lock,
 } from 'lucide-react';
 import { Sidebar } from '../components/Sidebar';
+import { useNotifications } from '../context/NotificationContext';
 import type { CoursePageNav } from '../App';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -115,6 +116,7 @@ function SectionHeader({
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Profile({ onBack, onNavigate, onLogout }: ProfileProps) {
+  const { openDrawer } = useNotifications();
   // Personal information — local edit state only, no backend persistence.
   const [personal, setPersonal] = useState({
     firstName:      'Danish',
@@ -145,10 +147,14 @@ export default function Profile({ onBack, onNavigate, onLogout }: ProfileProps) 
   function saveContact()      { setContact(contactDraft); setContactEditing(false); }
   function cancelContact()    { setContactDraft(contact); setContactEditing(false); }
 
+  function showUnavailable(action: string) {
+    window.alert(`${action} is not available in this preview.`);
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="student" activePage="profile" onNavigate={onNavigate} onBack={onBack} onLogout={onLogout} />
+      <Sidebar variant="student" activePage="profile" onNavigate={onNavigate} onBack={onBack} onLogout={onLogout} onHelp={openDrawer} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">
@@ -178,7 +184,11 @@ export default function Profile({ onBack, onNavigate, onLogout }: ProfileProps) 
                     >
                       DS
                     </div>
-                    <button className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer hover:underline underline-offset-2" style={{ color: '#0d8a7a' }}>
+                    <button
+                      onClick={() => showUnavailable('Changing your photo')}
+                      className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer hover:underline underline-offset-2"
+                      style={{ color: '#0d8a7a' }}
+                    >
                       <Camera className="w-3.5 h-3.5" strokeWidth={1.8} />
                       Change Photo
                     </button>
@@ -379,6 +389,7 @@ export default function Profile({ onBack, onNavigate, onLogout }: ProfileProps) 
                         <p className="text-xs text-slate-500 mt-0.5">Last changed 3 months ago</p>
                       </div>
                       <button
+                        onClick={() => showUnavailable('Changing your password')}
                         className="text-sm font-semibold cursor-pointer hover:underline underline-offset-2 shrink-0"
                         style={{ color: '#0d8a7a' }}
                       >
@@ -392,6 +403,7 @@ export default function Profile({ onBack, onNavigate, onLogout }: ProfileProps) 
                         <p className="text-xs text-slate-500 mt-0.5">Not enabled</p>
                       </div>
                       <button
+                        onClick={() => showUnavailable('Enabling two-factor authentication')}
                         className="px-4 py-2 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97] shrink-0"
                         style={{ background: 'linear-gradient(135deg, #0d8a7a, #14b8a6)', boxShadow: '0 4px 12px rgba(13,138,122,0.25)' }}
                       >

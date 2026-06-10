@@ -87,6 +87,10 @@ const SUPPORT = [
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps) {
+  function showUnavailable(action: string) {
+    window.alert(`${action} is not available in this preview.`);
+  }
+
   // Render the resources page with course nav and external resource cards.
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -139,6 +143,7 @@ export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps
                 {ELIBRARY.map(({ icon: Icon, title, sub, tag, link }) => (
                   <div
                     key={title}
+                    onClick={() => showUnavailable(title)}
                     className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 cursor-pointer transition-all duration-200 group"
                     style={{ borderTop: '3px solid #0d8a7a' }}
                   >
@@ -182,6 +187,7 @@ export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps
                       <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
                     </div>
                     <button
+                      onClick={() => showUnavailable(title)}
                       className="flex items-center gap-1.5 text-sm font-semibold shrink-0 cursor-pointer transition-all duration-150 group-hover:gap-2"
                       style={{ color: '#3b82f6' }}
                     >
@@ -216,6 +222,7 @@ export default function Resources({ onBack, onHome, onNavigate }: ResourcesProps
                     <p className="text-xs text-slate-500 mb-2 leading-relaxed">{sub}</p>
                     <p className="text-[11px] font-semibold text-amber-600 mb-4">{avail}</p>
                     <button
+                      onClick={() => showUnavailable(link)}
                       className="text-sm font-semibold cursor-pointer hover:underline underline-offset-2 transition-colors"
                       style={{ color: '#d97706' }}
                     >

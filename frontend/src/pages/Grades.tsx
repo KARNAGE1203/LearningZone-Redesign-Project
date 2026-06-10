@@ -88,7 +88,7 @@ export default function Grades({ onBack, onNavigate }: GradesProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="student" activePage="grades" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="student" activePage="grades" onNavigate={onNavigate} onBack={onBack} onHelp={openDrawer} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
 
@@ -334,9 +334,13 @@ export default function Grades({ onBack, onNavigate }: GradesProps) {
                           <span className="text-[10px] font-extrabold tracking-[0.12em] uppercase px-2.5 py-1 rounded-full" style={{ background: row.statusBg, color: row.statusFg }}>
                             {row.status}
                           </span>
-                          <button className="text-xs font-semibold cursor-pointer hover:underline underline-offset-2 whitespace-nowrap" style={{ color: row.linkColor }}>
-                            {row.link}
-                          </button>
+                          <button
+              onClick={() => onNavigate('assessments')}
+              className="text-xs font-semibold cursor-pointer hover:underline underline-offset-2 whitespace-nowrap"
+              style={{ color: row.linkColor }}
+            >
+              {row.link}
+            </button>
                         </div>
 
                         <button className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-slate-400 hover:bg-slate-100 cursor-pointer transition-colors shrink-0">

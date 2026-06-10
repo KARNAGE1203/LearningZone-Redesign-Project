@@ -42,6 +42,7 @@ function NotifCard({
   onArchive,
   onRestore,
   onDelete,
+  onViewSource,
 }: {
   // A single notification card with actions for mark read, archive, restore, delete.
   notif:       Notification;
@@ -49,6 +50,7 @@ function NotifCard({
   onArchive:   () => void;
   onRestore:   () => void;
   onDelete:    () => void;
+  onViewSource: () => void;
 }) {
   const type       = NOTIF_TYPES[notif.type];
   const isUnread   = notif.status === 'unread';
@@ -108,6 +110,7 @@ function NotifCard({
 
           <div className="flex items-center gap-4 flex-wrap">
             <button
+              onClick={onViewSource}
               className="text-[12px] font-semibold cursor-pointer hover:underline underline-offset-2"
               style={{ color: '#00897B' }}
             >
@@ -178,8 +181,15 @@ function SectionLabel({ text, right }: { text: string; right?: React.ReactNode }
 
 export default function Notifications({ onBack, onNavigate }: NotificationsProps) {
   // Notification state is provided by the context.
-  const { notifications, markAsRead, markAllAsRead, archive, restore, deleteNotif } =
+  const { notifications, markAsRead, markAllAsRead, archive, restore, deleteNotif, openDrawer } =
     useNotifications();
+
+  function handleViewSource(notif: Notification) {
+    if (notif.type === 'course') return onNavigate('materials');
+    if (notif.type === 'grade') return onNavigate('grades');
+    if (notif.type === 'deadline') return onNavigate('assessments');
+    return onNavigate('notifications');
+  }
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [typeFilter,   setTypeFilter]   = useState<NotificationType | 'all'>('all');
@@ -203,10 +213,11 @@ export default function Notifications({ onBack, onNavigate }: NotificationsProps
 
   const cardProps = (notif: Notification) => ({
     notif,
-    onMarkRead: () => markAsRead(notif.id),
-    onArchive:  () => archive(notif.id),
-    onRestore:  () => restore(notif.id),
-    onDelete:   () => deleteNotif(notif.id),
+    onMarkRead:   () => markAsRead(notif.id),
+    onArchive:    () => archive(notif.id),
+    onRestore:    () => restore(notif.id),
+    onDelete:     () => deleteNotif(notif.id),
+    onViewSource: () => handleViewSource(notif),
   });
 
   return (
@@ -214,7 +225,7 @@ export default function Notifications({ onBack, onNavigate }: NotificationsProps
       className="flex h-screen overflow-hidden"
       style={{ background: '#F0EFEA', fontFamily: 'Inter, system-ui, sans-serif' }}
     >
-      <Sidebar variant="student" activePage="notifications" onNavigate={onNavigate} onBack={onBack} />
+      <Sidebar variant="student" activePage="notifications" onNavigate={onNavigate} onBack={onBack} onHelp={openDrawer} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">

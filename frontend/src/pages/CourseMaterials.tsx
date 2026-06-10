@@ -208,6 +208,10 @@ export default function CourseMaterials({ onBack, onHome, onNavigate }: CourseMa
     }
   }
 
+  function showUnavailable(title: string) {
+    window.alert(`${title} preview is not available in this preview.`);
+  }
+
   const actionLabel = (type: ItemType) =>
     type === 'slides' ? 'View' : type === 'lab' ? 'Open' : 'Watch';
 
@@ -350,14 +354,14 @@ export default function CourseMaterials({ onBack, onHome, onNavigate }: CourseMa
 
                               {viewed ? (
                                 <button
-                                  onClick={item.type === 'video' ? () => handleWatchVideo(item, week) : undefined}
+                                  onClick={() => item.type === 'video' ? handleWatchVideo(item, week) : showUnavailable(item.title)}
                                   className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all"
                                 >
                                   {actionLabel(item.type)}
                                 </button>
                               ) : (
                                 <button
-                                  onClick={item.type === 'video' ? () => handleWatchVideo(item, week) : undefined}
+                                  onClick={() => item.type === 'video' ? handleWatchVideo(item, week) : showUnavailable(item.title)}
                                   className="shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold text-white cursor-pointer transition-all hover:brightness-110 active:scale-[0.97]"
                                   style={{ background: '#0d8a7a', boxShadow: '0 2px 8px rgba(13,138,122,0.28)' }}
                                 >

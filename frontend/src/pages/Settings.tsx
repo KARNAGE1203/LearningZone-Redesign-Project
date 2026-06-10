@@ -5,6 +5,7 @@ import {
   Download, LogOut,
 } from 'lucide-react';
 import { Sidebar } from '../components/Sidebar';
+import { useNotifications } from '../context/NotificationContext';
 import { cn } from '../lib/utils';
 import type { CoursePageNav } from '../App';
 
@@ -82,6 +83,7 @@ function SectionCard({ icon: Icon, title, children }: { icon: React.ElementType;
 const THEMES = ['Light', 'Dark', 'System'] as const;
 
 export default function Settings({ onBack, onNavigate, onLogout }: SettingsProps) {
+  const { openDrawer } = useNotifications();
   // Notification preferences
   const [courseAlerts,   setCourseAlerts]   = useState(true);
   const [uniAnnouncements, setUniAnnouncements] = useState(true);
@@ -97,10 +99,14 @@ export default function Settings({ onBack, onNavigate, onLogout }: SettingsProps
   const [showProfile, setShowProfile] = useState(true);
   const [activityStatus, setActivityStatus] = useState(false);
 
+  function showUnavailable(action: string) {
+    window.alert(`${action} is not available in this preview.`);
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      <Sidebar variant="student" activePage="settings" onNavigate={onNavigate} onBack={onBack} onLogout={onLogout} />
+      <Sidebar variant="student" activePage="settings" onNavigate={onNavigate} onBack={onBack} onLogout={onLogout} onHelp={openDrawer} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         <main className="flex-1 overflow-y-auto">
@@ -235,6 +241,7 @@ export default function Settings({ onBack, onNavigate, onLogout }: SettingsProps
                       </div>
                     </div>
                     <button
+                      onClick={() => showUnavailable('Exporting your data')}
                       className="text-sm font-semibold cursor-pointer hover:underline underline-offset-2 shrink-0"
                       style={{ color: '#0d8a7a' }}
                     >

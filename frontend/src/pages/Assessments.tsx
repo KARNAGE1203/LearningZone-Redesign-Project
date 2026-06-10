@@ -32,6 +32,10 @@ export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsP
   // Control whether past assessments are shown.
   const [pastExpanded, setPastExpanded] = useState(false);
 
+  function showUnavailable(action: string) {
+    window.alert(`${action} is not available in this preview.`);
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
@@ -112,10 +116,14 @@ export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsP
                       In Progress
                     </span>
                     <div className="flex items-center gap-2 ml-auto">
-                      <button className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 cursor-pointer transition-all duration-150">
+                      <button
+                        onClick={() => showUnavailable('Viewing the brief')}
+                        className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 cursor-pointer transition-all duration-150"
+                      >
                         View Brief
                       </button>
                       <button
+                        onClick={() => showUnavailable('Submitting work')}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97]"
                         style={{ background: 'linear-gradient(135deg, #0d8a7a, #14b8a6)', boxShadow: '0 4px 12px rgba(13,138,122,0.25)' }}
                       >
@@ -159,6 +167,7 @@ export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsP
                   </div>
 
                   <button
+                    onClick={() => showUnavailable('Downloading the date sheet')}
                     className="mt-5 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-150 hover:bg-teal-50 active:scale-[0.98]"
                     style={{ color: '#0d8a7a', border: '1.5px solid rgba(13,138,122,0.3)' }}
                   >
@@ -208,7 +217,11 @@ export default function Assessments({ onBack, onHome, onNavigate }: AssessmentsP
                         {item.grade}
                       </span>
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">Graded</span>
-                      <button className="text-xs font-semibold cursor-pointer hover:underline underline-offset-2 shrink-0" style={{ color: '#0d8a7a' }}>
+                      <button
+                        onClick={() => onNavigate('grades')}
+                        className="text-xs font-semibold cursor-pointer hover:underline underline-offset-2 shrink-0"
+                        style={{ color: '#0d8a7a' }}
+                      >
                         Review →
                       </button>
                     </div>

@@ -78,6 +78,17 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
   const [search, setSearch] = useState('');
   const { unreadCount, openDrawer } = useNotifications();
 
+  function handleNavLink(link: typeof NAV_LINKS[number]) {
+    if (link === 'My Courses') return onNavigate('dashboard');
+    if (link === 'Library') return onNavigate('resources');
+    return onNavigate('notifications');
+  }
+
+  function handleQuickLink(label: string) {
+    if (label === 'Library' || label === 'MyDMU') return onNavigate('resources');
+    return onNavigate('notifications');
+  }
+
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 200);
     return () => clearTimeout(t);
@@ -123,6 +134,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
             {NAV_LINKS.map((link) => (
               <button
                 key={link}
+                onClick={() => handleNavLink(link)}
                 className={cn(
                   'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer',
                   link === 'My Courses'
@@ -633,6 +645,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
 
                     {/* CTA */}
                     <button
+                      onClick={(e) => { e.stopPropagation(); onViewCourse(block); }}
                       className="mt-auto w-full py-2 text-xs font-semibold rounded-xl transition-colors duration-150 cursor-pointer"
                       style={{
                         background: accentBg,
@@ -700,7 +713,10 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
                 ))}
               </div>
 
-              <button className="mt-4 w-full py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-teal-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-teal-300 rounded-xl">
+              <button
+                onClick={() => onNavigate('notifications')}
+                className="mt-4 w-full py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-teal-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-teal-300 rounded-xl"
+              >
                 View All Announcements
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -719,6 +735,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
                 {COMMUNITIES.map(({ icon: Icon, name, sub, color, bg }) => (
                   <button
                     key={name}
+                    onClick={() => onNavigate('notifications')}
                     className="flex items-start gap-3 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm cursor-pointer transition-all duration-150 text-left group w-full min-h-[100px]"
                   >
                     <div
@@ -782,7 +799,10 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
                 ))}
               </div>
 
-              <button className="mt-4 w-full py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-teal-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-teal-300 rounded-xl">
+              <button
+                onClick={() => onNavigate('notifications')}
+                className="mt-4 w-full py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-teal-600 cursor-pointer transition-colors border border-dashed border-slate-200 hover:border-teal-300 rounded-xl"
+              >
                 View Full Calendar
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -801,6 +821,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
                 {QUICK_LINKS.map(({ icon: Icon, label, color, bg }) => (
                   <button
                     key={label}
+                    onClick={() => handleQuickLink(label)}
                     className="flex items-center gap-3 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm cursor-pointer transition-all duration-150 group text-left"
                   >
                     <div

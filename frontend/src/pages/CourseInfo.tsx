@@ -50,6 +50,10 @@ export default function CourseInfo({ onBack, onHome, onNavigate }: CourseInfoPro
     return () => clearTimeout(t);
   }, []);
 
+  function showUnavailable(action: string) {
+    window.alert(`${action} is not available in this preview.`);
+  }
+
   // Delay the animation to make the page feel smoother on load.
 
   return (
@@ -258,6 +262,7 @@ export default function CourseInfo({ onBack, onHome, onNavigate }: CourseInfoPro
                   <div className="border-t border-slate-100 my-5" />
 
                   <button
+                    onClick={() => showUnavailable('Sending email')}
                     className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97]"
                     style={{ background: 'linear-gradient(135deg, #0d8a7a, #14b8a6)', boxShadow: '0 4px 14px rgba(13,138,122,0.28)' }}
                   >

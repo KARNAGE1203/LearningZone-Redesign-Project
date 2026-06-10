@@ -31,7 +31,10 @@ DMU Dubai's existing learning portal works, but it wasn't designed with the stud
 | **Course Materials** | Week-by-week materials list with slides, labs, and videos plus a video player modal. |
 | **Assessments** | Assessment overview with active tasks, date sheet, and past assessment history. |
 | **Course Info** | Course details, weighting breakdown, timeline, and instructor contact information. |
+| **Course Summary** | Read-only archived module review with final grade, completed assessments, and course history. |
 | **Resources** | Library links, external study resources, and student support contacts. |
+| **Profile** | Student account details, contact info, and personal settings. |
+| **Settings** | App preferences, session management, and logout controls. |
 
 ---
 
@@ -40,16 +43,17 @@ DMU Dubai's existing learning portal works, but it wasn't designed with the stud
 ### Frontend
 | Tool | Purpose |
 |------|---------|
-| React 18 + TypeScript | UI framework |
-| Vite 5 | Build tool (pinned — Vite 6 requires Node ≥ 20.19) |
+| React 19 + TypeScript 6 | UI framework |
+| Vite 5 | Build tool |
 | Tailwind CSS v3 | Utility-first styling |
 | lucide-react | Icon library |
+| react-player | Embedded video playback for course materials |
 
 ### Backend
 | Tool | Purpose |
 |------|---------|
-| Node.js 20 + Express 5 + TypeScript | API server |
-| Prisma 5 | ORM (pinned — Prisma 7 requires Node ≥ 20.19) |
+| Node.js 20 + Express 5 + TypeScript 6 | API server |
+| Prisma 5 | ORM |
 | SQLite | Database — auto-seeded on every deploy |
 | JWT + bcryptjs | Authentication |
 
@@ -74,7 +78,7 @@ cd learning-zone-redesign
 cd backend
 cp .env.example .env        # fill in JWT_SECRET with any long random string
 npm install
-npx prisma migrate deploy   # create the SQLite schema
+npm run db:migrate          # create the SQLite schema
 npm run db:seed             # seed the demo student account
 npm run dev                 # API running at http://localhost:3001
 ```
@@ -177,6 +181,9 @@ learning-zone-redesign/
 │   │   │   ├── CourseMaterials.tsx
 │   │   │   ├── Assessments.tsx
 │   │   │   ├── CourseInfo.tsx
+│   │   │   ├── CourseSummary.tsx
+│   │   │   ├── Profile.tsx
+│   │   │   ├── Settings.tsx
 │   │   │   └── Resources.tsx
 │   │   ├── lib/
 │   │   │   ├── api.ts             # Typed fetch wrapper
@@ -191,7 +198,7 @@ learning-zone-redesign/
 
 ## Roadmap
 
-- [ ] Connect My Courses and Dashboard to live API data
+- [ ] Connect dashboard and course pages to live API data
 - [ ] Assignments submission flow
 - [ ] Quizzes module
 - [ ] Grade book with trend charts

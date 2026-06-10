@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   GraduationCap, ArrowLeft, LayoutDashboard, BarChart2,
   FileText, ClipboardList, BookOpen, Info, Menu, X, Bell,
-  User, Settings as SettingsIcon,
+  HelpCircle,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { AvatarDropdown } from './AvatarDropdown';
@@ -16,6 +16,7 @@ export interface SidebarProps {
   onNavigate:   (page: CoursePageNav) => void;
   onBack:       () => void;
   onHome?:      () => void;
+  onHelp?:      () => void;
   onLogout?:    () => void;
   /** Override the "course identity" block shown for the course/archive variants. */
   courseAbbr?:  string;
@@ -30,8 +31,6 @@ const STUDENT_NAV: { icon: React.ElementType; label: string; page: CoursePageNav
   { icon: LayoutDashboard, label: 'Dashboard',     page: 'dashboard'     },
   { icon: BarChart2,       label: 'Grades',        page: 'grades'        },
   { icon: Bell,            label: 'Notifications', page: 'notifications' },
-  { icon: User,            label: 'Profile',       page: 'profile'       },
-  { icon: SettingsIcon,    label: 'Settings',      page: 'settings'      },
 ];
 
 const COURSE_NAV: { icon: React.ElementType; label: string; page: CoursePageNav }[] = [
@@ -49,6 +48,7 @@ function Content({
   onNavigate,
   onBack,
   onHome,
+  onHelp,
   onLogout,
   onClose,
   courseAbbr,
@@ -182,6 +182,27 @@ function Content({
           </nav>
         )}
 
+        {variant === 'student' && onHelp && (
+          <div className="px-3 pt-4 pb-2">
+            <button
+              onClick={() => { onHelp(); onClose?.(); }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] cursor-pointer transition-all duration-150 text-left"
+              style={{ color: 'rgba(255,255,255,0.65)', background: 'rgba(255,255,255,0.06)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'rgba(255,255,255,0.9)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'rgba(255,255,255,0.65)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+              }}
+            >
+              <HelpCircle className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.65)' }} strokeWidth={1.8} />
+              Help & Support
+            </button>
+          </div>
+        )}
+
         {/* Archive notice */}
         {variant === 'archive' && (
           <p className="px-5 text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -189,58 +210,6 @@ function Content({
           </p>
         )}
 
-        {/* ── Course quick-links (student sidebar only) ──────────────────── */}
-        {variant === 'student' && (
-          <>
-            <div className="mx-4 mt-3 mb-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
-
-            {/* Course label + chip */}
-            <p
-              className="px-5 mb-2 text-[9px] font-extrabold tracking-[0.2em] uppercase"
-              style={{ color: 'rgba(255,255,255,0.32)' }}
-            >
-              Current Course
-            </p>
-            <div className="px-4 mb-2 flex items-center gap-2">
-              <div
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[8px] font-extrabold text-white shrink-0"
-                style={{ background: 'rgba(255,255,255,0.15)' }}
-              >
-                OS
-              </div>
-              <span className="text-[11px] font-semibold truncate" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                OS &amp; Networks
-              </span>
-            </div>
-
-            {/* Course nav shortcuts */}
-            <nav className="px-3 space-y-0.5 pb-2">
-              {COURSE_NAV.map(({ icon: Icon, label, page }) => (
-                <button
-                  key={label}
-                  onClick={() => { onNavigate(page); onClose?.(); }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[12px] cursor-pointer transition-all duration-150 text-left"
-                  style={{ color: 'rgba(255,255,255,0.45)' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color      = 'rgba(255,255,255,0.8)';
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.07)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color      = 'rgba(255,255,255,0.45)';
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                >
-                  <Icon
-                    className="w-3.5 h-3.5 shrink-0"
-                    style={{ color: 'rgba(255,255,255,0.38)' }}
-                    strokeWidth={1.8}
-                  />
-                  {label}
-                </button>
-              ))}
-            </nav>
-          </>
-        )}
 
       </div>
 
