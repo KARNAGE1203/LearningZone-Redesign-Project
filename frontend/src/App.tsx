@@ -8,6 +8,8 @@ import Assessments from './pages/Assessments';
 import Resources from './pages/Resources';
 import CourseInfo from './pages/CourseInfo';
 import Notifications from './pages/Notifications';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import { NotificationDrawer } from './components/NotificationDrawer';
 import { NotificationToast } from './components/NotificationToast';
 
@@ -18,6 +20,8 @@ export type Page =
   | 'dashboard'
   | 'grades'
   | 'notifications'
+  | 'profile'
+  | 'settings'
   | 'materials'
   | 'assessments'
   | 'resources'
@@ -61,6 +65,8 @@ function App() {
         <Home
           onEnterCourse={() => setPage('dashboard')}
           onContinueLearning={() => setPage('materials')}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
         />
       );
     }
@@ -90,6 +96,26 @@ function App() {
         <Notifications
           onBack={() => setPage('home')}
           onNavigate={handleNavigate}
+        />
+      );
+    }
+
+    if (page === 'profile') {
+      return (
+        <Profile
+          onBack={() => setPage('home')}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+        />
+      );
+    }
+
+    if (page === 'settings') {
+      return (
+        <Settings
+          onBack={() => setPage('home')}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
         />
       );
     }

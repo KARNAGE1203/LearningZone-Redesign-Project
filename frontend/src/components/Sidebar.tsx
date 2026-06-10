@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import {
   GraduationCap, ArrowLeft, LayoutDashboard, BarChart2,
   FileText, ClipboardList, BookOpen, Info, Menu, X, Bell,
+  User, Settings as SettingsIcon,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { AvatarDropdown } from './AvatarDropdown';
 import type { CoursePageNav } from '../App';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,15 +16,18 @@ export interface SidebarProps {
   onNavigate: (page: CoursePageNav) => void;
   onBack:     () => void;
   onHome?:    () => void;
+  onLogout?:  () => void;
 }
 
 // ─── Nav config ───────────────────────────────────────────────────────────────
 // Sidebar navigation items for student and course views.
 
 const STUDENT_NAV: { icon: React.ElementType; label: string; page: CoursePageNav }[] = [
-  { icon: LayoutDashboard, label: 'Dashboard',    page: 'dashboard'    },
-  { icon: BarChart2,       label: 'Grades',       page: 'grades'       },
+  { icon: LayoutDashboard, label: 'Dashboard',     page: 'dashboard'     },
+  { icon: BarChart2,       label: 'Grades',        page: 'grades'        },
   { icon: Bell,            label: 'Notifications', page: 'notifications' },
+  { icon: User,            label: 'Profile',       page: 'profile'       },
+  { icon: SettingsIcon,    label: 'Settings',      page: 'settings'      },
 ];
 
 const COURSE_NAV: { icon: React.ElementType; label: string; page: CoursePageNav }[] = [
@@ -40,6 +45,7 @@ function Content({
   onNavigate,
   onBack,
   onHome,
+  onLogout,
   onClose,
 }: SidebarProps & { onClose?: () => void }) {
   const navItems = variant === 'student' ? STUDENT_NAV : COURSE_NAV;
@@ -225,18 +231,11 @@ function Content({
         className="px-4 pt-4 pb-5 shrink-0"
         style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
       >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-extrabold shrink-0"
-            style={{ background: 'linear-gradient(135deg, #7c3aed, #0d8a7a)' }}
-          >
-            DS
-          </div>
-          <div className="min-w-0">
-            <p className="text-white text-[13px] font-medium leading-none truncate">Danish Saini</p>
-            <p className="text-[11px] mt-1 truncate" style={{ color: 'rgba(255,255,255,0.42)' }}>Student</p>
-          </div>
-        </div>
+        <AvatarDropdown
+          onNavigate={(p) => { onNavigate(p); onClose?.(); }}
+          onLogout={onLogout}
+          variant="sidebar"
+        />
       </div>
     </div>
   );
@@ -244,7 +243,7 @@ function Content({
 
 // ─── Exported Sidebar ─────────────────────────────────────────────────────────
 
-export function Sidebar({ variant, activePage, onNavigate, onBack, onHome }: SidebarProps) {
+export function Sidebar({ variant, activePage, onNavigate, onBack, onHome, onLogout }: SidebarProps) {
   const [open, setOpen] = useState(false);
 
   // Close the mobile drawer when we switch to desktop widths.
@@ -255,7 +254,7 @@ export function Sidebar({ variant, activePage, onNavigate, onBack, onHome }: Sid
     return () => mq.removeEventListener('change', h);
   }, []);
 
-  const cp = { variant, activePage, onNavigate, onBack, onHome };
+  const cp = { variant, activePage, onNavigate, onBack, onHome, onLogout };
 
   return (
     <>

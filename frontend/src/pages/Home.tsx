@@ -6,10 +6,14 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useNotifications } from '../context/NotificationContext';
+import { AvatarDropdown } from '../components/AvatarDropdown';
+import type { CoursePageNav } from '../App';
 
 interface HomeProps {
   onEnterCourse:      () => void;
   onContinueLearning: () => void;
+  onNavigate:         (page: CoursePageNav) => void;
+  onLogout:           () => void;
 }
 
 // ─── Static data ────────────────────────────────────────────────────────────
@@ -72,7 +76,7 @@ const ACTIVE_RING_C = 2 * Math.PI * ACTIVE_RING_R;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function Home({ onEnterCourse, onContinueLearning }: HomeProps) {
+export default function Home({ onEnterCourse, onContinueLearning, onNavigate, onLogout }: HomeProps) {
   // Delay used to animate in the hero section once the page mounts.
   const [ready, setReady] = useState(false);
   const [search, setSearch] = useState('');
@@ -172,15 +176,7 @@ export default function Home({ onEnterCourse, onContinueLearning }: HomeProps) {
               )}
             </button>
 
-            <button className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors">
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: 'linear-gradient(135deg, #7c3aed, #0d8a7a)' }}
-              >
-                <span className="text-white text-[10px] font-bold">DS</span>
-              </div>
-              <span className="hidden lg:block text-sm font-medium text-slate-700">Danish Saini</span>
-            </button>
+            <AvatarDropdown onNavigate={onNavigate} onLogout={onLogout} variant="topnav" />
 
             <button
               className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors"
