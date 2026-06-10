@@ -3,6 +3,7 @@ import {
   GraduationCap, Search, Bell, ArrowRight, CheckCircle2,
   Globe, Mountain, Building2, CalendarDays, Library, Headphones,
   Users, Megaphone, Calendar, ExternalLink, ChevronRight,
+  Database, Cpu, Code2, Server,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useNotifications } from '../context/NotificationContext';
@@ -22,10 +23,10 @@ interface HomeProps {
 const NAV_LINKS = ['My Courses', 'Calendar', 'Library', 'Support'] as const;
 
 const TIMELINE = [
-  { block: 1, course: 'Database Design',      grade: '68%', status: 'done'   as const, abbr: 'DB', color: '#0369a1', accentBg: '#e0f2fe' },
-  { block: 2, course: 'Fundamental CS',        grade: '74%', status: 'done'   as const, abbr: 'CS', color: '#7c3aed', accentBg: '#ede9fe' },
-  { block: 3, course: 'Computer Programming',  grade: '81%', status: 'done'   as const, abbr: 'CP', color: '#059669', accentBg: '#d1fae5' },
-  { block: 4, course: 'OS & Networks',         grade: '67%', status: 'active' as const, abbr: 'OS', color: '#0d8a7a', accentBg: '#ccfbf1' },
+  { block: 1, course: 'Database Design',      grade: '68%', status: 'done'   as const, abbr: 'DB', color: '#0369a1', accentBg: '#e0f2fe', icon: Database },
+  { block: 2, course: 'Fundamental CS',        grade: '74%', status: 'done'   as const, abbr: 'CS', color: '#7c3aed', accentBg: '#ede9fe', icon: Cpu },
+  { block: 3, course: 'Computer Programming',  grade: '81%', status: 'done'   as const, abbr: 'CP', color: '#059669', accentBg: '#d1fae5', icon: Code2 },
+  { block: 4, course: 'OS & Networks',         grade: '67%', status: 'active' as const, abbr: 'OS', color: '#0d8a7a', accentBg: '#ccfbf1', icon: Server },
 ];
 
 const ANNOUNCEMENTS = [
@@ -437,7 +438,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {TIMELINE.map(({ block, course, grade, status, abbr, color, accentBg }) => {
+            {TIMELINE.map(({ block, course, grade, status, abbr, color, accentBg, icon: Icon }) => {
               const active = status === 'active';
               const ringR  = 15;
               const ringC  = 2 * Math.PI * ringR;
@@ -446,7 +447,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
               if (active) return (
                 <div
                   key={block}
-                  className="rounded-2xl overflow-hidden flex flex-col"
+                  className="relative rounded-2xl overflow-hidden flex flex-col"
                   style={{
                     background:   'linear-gradient(145deg, #0d1b2a 0%, #0d3b38 100%)',
                     border:       '1.5px solid rgba(13,138,122,0.5)',
@@ -456,7 +457,14 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
                   {/* Teal glow top bar */}
                   <div className="h-1" style={{ background: 'linear-gradient(90deg, #0d8a7a, #34d399)' }} />
 
-                  <div className="p-5 flex flex-col flex-1">
+                  {/* Decorative course icon (background) */}
+                  <Icon
+                    className="absolute -right-5 -bottom-5 w-28 h-28 pointer-events-none"
+                    style={{ color: '#5eead4', opacity: 0.12 }}
+                    strokeWidth={1.2}
+                  />
+
+                  <div className="relative z-10 p-5 flex flex-col flex-1">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-3">
                       <span
@@ -528,12 +536,19 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
                 <div
                   key={block}
                   onClick={onEnterCourse}
-                  className="bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer group"
+                  className="relative bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer group"
                 >
                   {/* Coloured top bar */}
                   <div className="h-1 transition-opacity group-hover:opacity-90" style={{ background: color }} />
 
-                  <div className="p-5 flex flex-col flex-1">
+                  {/* Decorative course icon (background) */}
+                  <Icon
+                    className="absolute -right-5 -bottom-5 w-28 h-28 pointer-events-none transition-opacity group-hover:opacity-[0.09]"
+                    style={{ color, opacity: 0.06 }}
+                    strokeWidth={1.2}
+                  />
+
+                  <div className="relative z-10 p-5 flex flex-col flex-1">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-3">
                       <span
