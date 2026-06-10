@@ -459,9 +459,9 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
 
                   {/* Decorative course icon (background) */}
                   <Icon
-                    className="absolute -right-5 -bottom-5 w-28 h-28 pointer-events-none"
-                    style={{ color: '#5eead4', opacity: 0.12 }}
-                    strokeWidth={1.2}
+                    className="absolute -right-6 -bottom-8 w-44 h-44 pointer-events-none"
+                    style={{ color: '#5eead4', opacity: 0.14 }}
+                    strokeWidth={1}
                   />
 
                   <div className="relative z-10 p-5 flex flex-col flex-1">
@@ -543,9 +543,9 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
 
                   {/* Decorative course icon (background) */}
                   <Icon
-                    className="absolute -right-5 -bottom-5 w-28 h-28 pointer-events-none transition-opacity group-hover:opacity-[0.09]"
-                    style={{ color, opacity: 0.06 }}
-                    strokeWidth={1.2}
+                    className="absolute -right-6 -bottom-8 w-44 h-44 pointer-events-none transition-opacity group-hover:opacity-[0.11]"
+                    style={{ color, opacity: 0.07 }}
+                    strokeWidth={1}
                   />
 
                   <div className="relative z-10 p-5 flex flex-col flex-1">
