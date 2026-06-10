@@ -179,6 +179,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onNavigate, on
             <AvatarDropdown onNavigate={onNavigate} onLogout={onLogout} variant="topnav" />
 
             <button
+              onClick={() => onNavigate('settings')}
               className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors"
               aria-label="Settings"
             >
