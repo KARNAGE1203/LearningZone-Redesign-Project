@@ -410,7 +410,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
                   </div>
 
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-snug mb-2 tracking-tight">
-                    Operating Systems and Networks
+                    CTECH1704D: Operating Systems and Networks
                   </h2>
                   <p className="text-sm font-medium mb-7" style={{ color: 'rgba(94,234,212,0.75)' }}>
                     Prof. Muhammad Al-Ibaisi · MWF 10:00 AM
@@ -445,7 +445,7 @@ export default function Home({ onEnterCourse, onContinueLearning, onViewCourse, 
                       className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white cursor-pointer transition-all duration-150 hover:brightness-110 active:scale-[0.97]"
                       style={{ background: '#0d8a7a', boxShadow: '0 6px 20px rgba(13,138,122,0.4)' }}
                     >
-                      Go to Course
+                      View Dashboard
                       <ArrowRight className="w-4 h-4" />
                     </button>
                     <button

@@ -342,13 +342,13 @@ export default function Dashboard({ userId: _userId, onBack, onNavigate }: Dashb
                   <div className="mb-5 sm:mb-6">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-semibold text-slate-600">Course Progress</span>
-                      <span className="text-sm font-extrabold text-slate-800">55%</span>
+                      <span className="text-sm font-extrabold text-slate-800">67%</span>
                     </div>
                     <div className="w-full h-2.5 sm:h-3 bg-slate-100 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full"
                         style={{
-                          width:      ready ? '55%' : '0%',
+                          width:      ready ? '67%' : '0%',
                           background: 'linear-gradient(90deg, #0d8a7a, #34d399)',
                           transition: 'width 1.8s cubic-bezier(0.16, 1, 0.3, 1)',
                           boxShadow:  ready ? '0 0 10px rgba(52,211,153,0.4)' : 'none',
