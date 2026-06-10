@@ -76,9 +76,14 @@ export default function CourseInfo({ onBack, onHome, onNavigate }: CourseInfoPro
 
           {/* Breadcrumb */}
           <div className="px-6 lg:px-8 py-3 flex items-center gap-2 text-sm border-b border-slate-100 bg-white">
-            <span className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">My Courses</span>
+            <span
+              onClick={onBack}
+              className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors"
+            >
+              CTEC1704D
+            </span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-            <span className="font-semibold" style={{ color: '#0d8a7a' }}>Operating Systems and Networks</span>
+            <span className="font-semibold" style={{ color: '#0d8a7a' }}>Course Info</span>
           </div>
 
           {/* Content: two-column 60/40 */}
